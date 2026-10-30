@@ -80,3 +80,16 @@
   margin-top: 4px;
   cursor: pointer;
 }
+
+/* Move overdue to today sits beside the overdue count, lifted above .footer:before like Sort by date. */
+.footer .move-overdue {
+  position: relative;
+  float: left;
+  margin: 4px 0 0 12px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.footer .move-overdue:hover {
+  text-decoration: underline;
+}

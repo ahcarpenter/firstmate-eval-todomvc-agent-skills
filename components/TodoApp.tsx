@@ -8,6 +8,7 @@ import {
   isOverdue,
   loadSortByDue,
   loadTodos,
+  moveOverdueToToday,
   nextId,
   pluralize,
   saveSortByDue,
@@ -82,6 +83,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
 
   function clearCompleted() {
     setTodos(todos.filter((todo) => !todo.completed));
+  }
+
+  function moveOverdue() {
+    setTodos(moveOverdueToToday(todos, todayISO()));
   }
 
   const today = todayISO();
@@ -176,6 +181,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
             <span className="overdue-count">
               <strong>{overdueCount}</strong> overdue
             </span>
+            {overdueCount > 0 && (
+              <button className="move-overdue" onClick={moveOverdue}>
+                Move overdue to today
+              </button>
+            )}
             <label className="sort-by-due">
               <input
                 type="checkbox"

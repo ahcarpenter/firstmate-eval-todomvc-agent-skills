@@ -23,7 +23,7 @@ npm run test:e2e  # end-to-end tests (Playwright); builds and starts the app on 
 ## Layout
 
 - `app/[[...filter]]/page.tsx` serves `/`, `/active`, `/completed`, and `/overdue`.
-- `components/TodoApp.tsx` holds the list state, persistence, and the page UI.
+- `components/TodoApp.tsx` holds the list state, persistence, and the page UI, including the footer's "Move overdue to today" button, shown while any todo is overdue.
 - `components/TodoItem.tsx` renders one todo and, while editing, its title and "Change date" fields.
 - `lib/todos.ts` has the `Todo` type, filtering, case-insensitive title search, and due-date sorting (a todo is overdue when it is not completed and its due date is before today), and localStorage helpers.
 

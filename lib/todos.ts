@@ -56,6 +56,11 @@ export function isOverdue(todo: Todo, today: string): boolean {
   return !todo.completed && todo.due !== undefined && todo.due < today;
 }
 
+// Every overdue todo becomes due today; the rest keep their dates.
+export function moveOverdueToToday(todos: Todo[], today: string): Todo[] {
+  return todos.map((todo) => (isOverdue(todo, today) ? { ...todo, due: today } : todo));
+}
+
 export function filterTodos(todos: Todo[], filter: Filter, today: string = todayISO()): Todo[] {
   if (filter === "active") return todos.filter((todo) => !todo.completed);
   if (filter === "completed") return todos.filter((todo) => todo.completed);

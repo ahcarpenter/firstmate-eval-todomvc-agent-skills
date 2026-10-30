@@ -3,6 +3,7 @@ import {
   filterTodos,
   formatDue,
   isOverdue,
+  moveOverdueToToday,
   nextId,
   pluralize,
   searchTodos,
@@ -79,6 +80,34 @@ describe("isOverdue", () => {
 
   it("is false for a todo without a due date", () => {
     expect(isOverdue({ id: 1, title: "Pay rent", completed: false }, today)).toBe(false);
+  });
+});
+
+describe("moveOverdueToToday", () => {
+  const today = "2026-11-05";
+  const list: Todo[] = [
+    { id: 1, title: "Pay rent", completed: false, due: "2026-11-01" },
+    { id: 2, title: "Call mom", completed: false, due: "2026-11-04" },
+    { id: 3, title: "File taxes", completed: true, due: "2026-11-03" },
+    { id: 4, title: "Buy milk", completed: false, due: "2026-11-05" },
+    { id: 5, title: "Book flights", completed: false, due: "2026-11-10" },
+    { id: 6, title: "Walk the dog", completed: false },
+  ];
+
+  it("moves every overdue todo to today and leaves the others alone", () => {
+    expect(moveOverdueToToday(list, today)).toEqual([
+      { id: 1, title: "Pay rent", completed: false, due: "2026-11-05" },
+      { id: 2, title: "Call mom", completed: false, due: "2026-11-05" },
+      list[2],
+      list[3],
+      list[4],
+      list[5],
+    ]);
+  });
+
+  it("leaves the original list untouched", () => {
+    moveOverdueToToday(list, today);
+    expect(list[0].due).toBe("2026-11-01");
   });
 });
 
