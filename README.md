@@ -25,8 +25,10 @@ npm run test:e2e  # end-to-end tests (Playwright); builds and starts the app on 
 - `app/[[...filter]]/page.tsx` serves `/`, `/active`, `/completed`, and `/overdue`.
 - `components/TodoApp.tsx` holds the list state, persistence, and the page UI.
 - `components/TodoItem.tsx` renders one todo and its edit fields for the title and due date.
-- `lib/todos.ts` has the `Todo` type, filtering, due-date and overdue helpers, and localStorage helpers.
+- `lib/todos.ts` has the `Todo` type, filtering, due-date sorting and overdue helpers, and localStorage helpers.
 
 A todo is overdue when it is not completed and its due date is before today in the browser's time zone.
 
-Todos persist in `localStorage` under the `todos-nextjs` key.
+The footer's "Sort by date" checkbox shows todos earliest due date first, with undated todos last and ties in their usual order, within every filter.
+
+Todos persist in `localStorage` under the `todos-nextjs` key, and the "Sort by date" choice under `todos-nextjs-sort-by-date`.

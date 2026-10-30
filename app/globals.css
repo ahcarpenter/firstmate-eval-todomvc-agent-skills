@@ -61,3 +61,15 @@
   flex: 1;
   min-width: 0;
 }
+
+/* A row under the filters, so it never overlaps them or the items-left count.
+   Positioned so it paints above the footer's stacked-paper shadow, like the filters. */
+.footer .sort-by-date {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  clear: both;
+  padding-top: 12px;
+}

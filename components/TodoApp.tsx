@@ -7,11 +7,14 @@ import {
   editTodo,
   filterTodos,
   isOverdue,
+  loadSortByDate,
   loadTodos,
   localDateString,
   nextId,
   pluralize,
+  saveSortByDate,
   saveTodos,
+  sortByDueDate,
   type Filter,
   type Todo,
 } from "@/lib/todos";
@@ -24,17 +27,23 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   const [newTitle, setNewTitle] = useState("");
   const [newDueDate, setNewDueDate] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [sortByDate, setSortByDate] = useState(false);
 
   useEffect(() => {
     // Read storage after mount so the server render and the first client render match.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTodos(loadTodos());
+    setSortByDate(loadSortByDate());
     setLoaded(true);
   }, []);
 
   useEffect(() => {
     if (loaded) saveTodos(todos);
   }, [todos, loaded]);
+
+  useEffect(() => {
+    if (loaded) saveSortByDate(sortByDate);
+  }, [sortByDate, loaded]);
 
   function addTodo(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key !== ENTER_KEY) return;
@@ -75,7 +84,8 @@ export default function TodoApp({ filter }: { filter: Filter }) {
 
   // Todos load only on the client, so reading the clock here cannot cause a hydration mismatch.
   const today = localDateString(new Date());
-  const shown = filterTodos(todos, filter, today);
+  const filtered = filterTodos(todos, filter, today);
+  const shown = sortByDate ? sortByDueDate(filtered) : filtered;
   const activeCount = todos.filter((todo) => !todo.completed).length;
   const completedCount = todos.length - activeCount;
   const overdueCount = todos.filter((todo) => isOverdue(todo, today)).length;
@@ -160,6 +170,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
                 Clear completed
               </button>
             )}
+            <label className="sort-by-date">
+              <input type="checkbox" checked={sortByDate} onChange={(event) => setSortByDate(event.target.checked)} />
+              Sort by date
+            </label>
           </footer>
         )}
       </section>

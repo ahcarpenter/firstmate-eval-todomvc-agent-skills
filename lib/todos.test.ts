@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { editTodo, filterTodos, formatDueDate, isOverdue, localDateString, nextId, pluralize, type Todo } from "./todos";
+import { editTodo, filterTodos, formatDueDate, isOverdue, localDateString, nextId, pluralize, sortByDueDate, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -117,5 +117,37 @@ describe("editTodo", () => {
     const edited = editTodo(todo, "Pay rent", "");
     expect(edited).toEqual({ id: 3, title: "Pay rent", completed: false });
     expect("dueDate" in edited).toBe(false);
+  });
+});
+
+describe("sortByDueDate", () => {
+  it("puts the earliest due date first and undated todos last", () => {
+    expect(sortByDueDate(dated).map((todo) => todo.id)).toEqual([4, 3, 5, 1, 2]);
+  });
+
+  it("keeps the usual order for ties", () => {
+    const tied: Todo[] = [
+      { id: 1, title: "a", completed: false, dueDate: "2026-11-02" },
+      { id: 2, title: "b", completed: false },
+      { id: 3, title: "c", completed: false, dueDate: "2026-11-01" },
+      { id: 4, title: "d", completed: false, dueDate: "2026-11-02" },
+      { id: 5, title: "e", completed: false },
+    ];
+    expect(sortByDueDate(tied).map((todo) => todo.id)).toEqual([3, 1, 4, 2, 5]);
+  });
+
+  it("treats an invalid due date as undated", () => {
+    const invalid: Todo[] = [
+      { id: 1, title: "a", completed: false, dueDate: "not a date" },
+      { id: 2, title: "b", completed: false, dueDate: "" },
+      { id: 3, title: "c", completed: false, dueDate: "2026-11-01" },
+    ];
+    expect(sortByDueDate(invalid).map((todo) => todo.id)).toEqual([3, 1, 2]);
+  });
+
+  it("does not change the given list", () => {
+    const copy = [...dated];
+    sortByDueDate(dated);
+    expect(dated).toEqual(copy);
   });
 });
