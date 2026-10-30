@@ -1,0 +1,45 @@
+/* Keyboard and screen reader additions on top of todomvc-app-css. */
+
+.todo-list li .view label {
+  padding-right: 100px;
+}
+
+.todo-list li .edit-button {
+  position: absolute;
+  top: 0;
+  right: 50px;
+  bottom: 0;
+  width: 40px;
+  height: 40px;
+  margin: auto 0;
+  font-size: 22px;
+  color: #949494;
+  transition: color 0.2s ease-out;
+}
+
+.todo-list li .edit-button:hover,
+.todo-list li .edit-button:focus {
+  color: #484848;
+}
+
+.todo-list li .edit-button:after {
+  content: "✎";
+  display: block;
+  height: 100%;
+  line-height: 40px;
+}
+
+/*
+  The base styles hide the item buttons with display: none until hover, which also removes them
+  from the accessibility tree. Keep them rendered, and clip them out of sight until the row is
+  hovered or holds keyboard focus.
+*/
+.todo-list li .edit-button,
+.todo-list li .destroy {
+  display: block;
+}
+
+.todo-list li:not(:hover):not(:focus-within) .edit-button,
+.todo-list li:not(:hover):not(:focus-within) .destroy {
+  clip-path: inset(50%);
+}
