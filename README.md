@@ -22,9 +22,13 @@ npm run test:e2e  # end-to-end tests (Playwright); builds and starts the app on 
 
 ## Layout
 
-- `app/[[...filter]]/page.tsx` serves `/`, `/active`, and `/completed`.
-- `components/TodoApp.tsx` holds the list state, persistence, and the page UI.
+- `app/[[...filter]]/page.tsx` serves `/`, `/active`, and `/completed`, which show the first list.
+- `app/lists/[id]/[[...filter]]/page.tsx` serves `/lists/<id>`, `/lists/<id>/active`, and `/lists/<id>/completed`.
+- `components/TodoApp.tsx` holds the lists state, persistence, and the page UI.
+- `components/ListNav.tsx` links to every list and has the "New list name" field.
 - `components/TodoItem.tsx` renders one todo and its edit field.
-- `lib/todos.ts` has the `Todo` type, filtering, and localStorage helpers.
+- `lib/todos.ts` has the `Todo` type and filtering.
+- `lib/lists.ts` has the `TodoList` type, list ids, and localStorage helpers.
 
-Todos persist in `localStorage` under the `todos-nextjs` key.
+Lists persist in `localStorage` under the `todos-nextjs-lists` key.
+Todos saved before lists existed, under the `todos-nextjs` key, become a list called "Todos"; that old key is left in place.
