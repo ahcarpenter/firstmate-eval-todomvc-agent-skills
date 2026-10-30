@@ -4,12 +4,14 @@ import {
   LEGACY_STORAGE_KEY,
   STORAGE_KEY,
   addList,
+  deleteList,
   filterTodos,
   listPath,
   loadLists,
   nextId,
   nextListId,
   pluralize,
+  renameList,
   type Todo,
   type TodoList,
 } from "./todos";
@@ -77,6 +79,31 @@ describe("addList", () => {
     const lists = addList([{ id: "1", name: DEFAULT_LIST_NAME, todos }], "Groceries");
     expect(lists).toHaveLength(2);
     expect(lists[1]).toEqual({ id: "2", name: "Groceries", todos: [] });
+  });
+});
+
+describe("renameList", () => {
+  it("renames only the matching list", () => {
+    const lists: TodoList[] = [
+      { id: "1", name: "Home", todos },
+      { id: "2", name: "Work", todos: [] },
+    ];
+    expect(renameList(lists, "2", "Office")).toEqual([lists[0], { id: "2", name: "Office", todos: [] }]);
+  });
+});
+
+describe("deleteList", () => {
+  it("removes the list and its todos", () => {
+    const lists: TodoList[] = [
+      { id: "1", name: "Home", todos },
+      { id: "2", name: "Work", todos: [] },
+    ];
+    expect(deleteList(lists, "1")).toEqual([lists[1]]);
+  });
+
+  it("keeps the last list", () => {
+    const lists: TodoList[] = [{ id: "1", name: "Home", todos }];
+    expect(deleteList(lists, "1")).toBe(lists);
   });
 });
 

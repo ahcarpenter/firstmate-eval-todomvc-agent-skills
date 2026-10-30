@@ -36,3 +36,29 @@
   border: 1px solid #ccc;
   font: inherit;
 }
+
+.lists .list-action {
+  margin: 0 2px;
+  padding: 2px 5px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  color: #777;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.lists .list-action:hover:not(:disabled) {
+  border-color: #db7676;
+}
+
+.lists .list-action:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.lists .rename-list {
+  margin: 3px;
+  padding: 3px 7px;
+  border: 1px solid #ce4646;
+  font: inherit;
+}

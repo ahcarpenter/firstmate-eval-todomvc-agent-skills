@@ -43,6 +43,15 @@ export function addList(lists: TodoList[], name: string): TodoList[] {
   return [...lists, { id: nextListId(lists), name, todos: [] }];
 }
 
+export function renameList(lists: TodoList[], id: string, name: string): TodoList[] {
+  return lists.map((list) => (list.id === id ? { ...list, name } : list));
+}
+
+// The last list stays: with no lists saved, loadLists would bring back the old todos.
+export function deleteList(lists: TodoList[], id: string): TodoList[] {
+  return lists.length > 1 ? lists.filter((list) => list.id !== id) : lists;
+}
+
 export function listPath(id: string, filter: Filter = "all"): string {
   const base = `/lists/${encodeURIComponent(id)}`;
   return filter === "all" ? base : `${base}/${filter}`;

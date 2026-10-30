@@ -25,7 +25,7 @@ npm run test:e2e  # end-to-end tests (Playwright); builds and starts the app on 
 - `app/[[...filter]]/page.tsx` serves `/`, `/active`, and `/completed`, which show the first list.
 - `app/lists/[id]/[[...filter]]/page.tsx` serves `/lists/<id>`, `/lists/<id>/active`, and `/lists/<id>/completed`.
 - `components/TodoApp.tsx` holds the lists state, persistence, and the page UI.
-- `components/ListNav.tsx` links to every list and has the "New list name" field.
+- `components/ListNav.tsx` links to every list, with its Rename and Delete buttons, and has the "New list name" field.
 - `components/TodoItem.tsx` renders one todo and its edit field.
 - `lib/todos.ts` has the `Todo` and `TodoList` types, filtering, and localStorage helpers.
 

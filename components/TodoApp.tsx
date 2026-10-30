@@ -7,11 +7,13 @@ import ListNav from "@/components/ListNav";
 import TodoItem from "@/components/TodoItem";
 import {
   addList,
+  deleteList,
   filterTodos,
   listPath,
   loadLists,
   nextId,
   pluralize,
+  renameList,
   saveLists,
   type Filter,
   type Todo,
@@ -50,6 +52,12 @@ export default function TodoApp({ listId, filter }: { listId?: string; filter: F
     const next = addList(lists, name);
     setLists(next);
     router.push(listPath(next[next.length - 1].id));
+  }
+
+  function removeList(id: string) {
+    const next = deleteList(lists, id);
+    setLists(next);
+    if (id === list?.id) router.push(listPath(next[0].id));
   }
 
   function addTodo(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -163,7 +171,15 @@ export default function TodoApp({ listId, filter }: { listId?: string; filter: F
           </footer>
         )}
       </section>
-      {loaded && <ListNav lists={lists} currentId={list?.id} onCreate={createList} />}
+      {loaded && (
+        <ListNav
+          lists={lists}
+          currentId={list?.id}
+          onCreate={createList}
+          onRename={(id, name) => setLists(renameList(lists, id, name))}
+          onDelete={removeList}
+        />
+      )}
       <footer className="info">
         <p>Double-click to edit a todo</p>
         <p>
