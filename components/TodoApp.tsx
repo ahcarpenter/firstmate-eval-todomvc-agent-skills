@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import TodoItem from "@/components/TodoItem";
 import UndoToast from "@/components/UndoToast";
 import {
@@ -9,8 +9,9 @@ import {
   loadTodos,
   nextId,
   pluralize,
+  removeCompleted,
   removeTodo,
-  restoreTodo,
+  restoreTodos,
   saveTodos,
   type DeletedTodo,
   type Filter,
@@ -19,13 +20,21 @@ import {
 
 const ENTER_KEY = "Enter";
 
+// What the undo toast can bring back. The key gives each offer its own toast and countdown.
+type UndoOffer = {
+  key: number;
+  message: string;
+  deleted: DeletedTodo[];
+};
+
 export default function TodoApp({ filter }: { filter: Filter }) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [deleted, setDeleted] = useState<DeletedTodo | null>(null);
-  const forgetDeleted = useCallback(() => setDeleted(null), []);
+  const [undoOffer, setUndoOffer] = useState<UndoOffer | null>(null);
+  const undoOfferCount = useRef(0);
+  const forgetUndoOffer = useCallback(() => setUndoOffer(null), []);
 
   useEffect(() => {
     // Read storage after mount so the server render and the first client render match.
@@ -54,15 +63,20 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     setTodos(todos.map((todo) => ({ ...todo, completed })));
   }
 
+  function offerUndo(message: string, deleted: DeletedTodo[]) {
+    undoOfferCount.current += 1;
+    setUndoOffer({ key: undoOfferCount.current, message, deleted });
+  }
+
   function destroy(id: number) {
     const result = removeTodo(todos, id);
     setTodos(result.todos);
-    setDeleted(result.deleted);
+    if (result.deleted) offerUndo(`Deleted “${result.deleted.todo.title}”`, [result.deleted]);
   }
 
-  function undoDelete() {
-    if (deleted) setTodos(restoreTodo(todos, deleted));
-    setDeleted(null);
+  function undo() {
+    if (undoOffer) setTodos(restoreTodos(todos, undoOffer.deleted));
+    setUndoOffer(null);
   }
 
   function save(id: number, title: string) {
@@ -76,7 +90,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   }
 
   function clearCompleted() {
-    setTodos(todos.filter((todo) => !todo.completed));
+    const result = removeCompleted(todos);
+    const count = result.deleted.length;
+    setTodos(result.todos);
+    offerUndo(`Cleared ${count} completed ${pluralize(count, "todo")}`, result.deleted);
   }
 
   const shown = filterTodos(todos, filter);
@@ -153,8 +170,8 @@ export default function TodoApp({ filter }: { filter: Filter }) {
           </footer>
         )}
       </section>
-      {deleted && (
-        <UndoToast key={deleted.todo.id} title={deleted.todo.title} onUndo={undoDelete} onExpire={forgetDeleted} />
+      {undoOffer && (
+        <UndoToast key={undoOffer.key} message={undoOffer.message} onUndo={undo} onExpire={forgetUndoOffer} />
       )}
       <footer className="info">
         <p>Double-click to edit a todo</p>

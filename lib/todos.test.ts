@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, nextId, pluralize, removeTodo, restoreTodo, type Todo } from "./todos";
+import {
+  filterTodos,
+  nextId,
+  pluralize,
+  removeCompleted,
+  removeTodo,
+  restoreTodo,
+  restoreTodos,
+  type Todo,
+} from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -55,6 +64,16 @@ describe("removeTodo", () => {
   });
 });
 
+describe("removeCompleted", () => {
+  it("removes completed todos and remembers where they were", () => {
+    expect(removeCompleted(todos)).toEqual({ todos: [todos[0]], deleted: [{ todo: todos[1], index: 1 }] });
+  });
+
+  it("removes nothing when no todo is completed", () => {
+    expect(removeCompleted([todos[0]])).toEqual({ todos: [todos[0]], deleted: [] });
+  });
+});
+
 describe("restoreTodo", () => {
   it("puts the todo back at its old position", () => {
     const { todos: rest, deleted } = removeTodo(todos, 1);
@@ -72,5 +91,33 @@ describe("restoreTodo", () => {
       { ...todos[1], id: 3 },
       added,
     ]);
+  });
+});
+
+describe("restoreTodos", () => {
+  const mixed: Todo[] = [
+    { id: 1, title: "Buy milk", completed: true },
+    { id: 2, title: "Walk the dog", completed: false },
+    { id: 3, title: "Pay rent", completed: true },
+    { id: 4, title: "Call mum", completed: true },
+    { id: 5, title: "Water plants", completed: false },
+  ];
+
+  it("puts every todo back at its old position, still completed", () => {
+    const { todos: rest, deleted } = removeCompleted(mixed);
+    expect(restoreTodos(rest, deleted)).toEqual(mixed);
+  });
+
+  it("keeps todos added since then after the restored ones", () => {
+    const { todos: rest, deleted } = removeCompleted(mixed);
+    const added = { id: 6, title: "Read a book", completed: false };
+    expect(restoreTodos([...rest, added], deleted)).toEqual([...mixed, added]);
+  });
+
+  it("gives each todo a unique id when its old one was taken", () => {
+    const { todos: rest, deleted } = removeCompleted(mixed.slice(0, 4));
+    const added = { id: 3, title: "Read a book", completed: false };
+    const ids = restoreTodos([...rest, added], deleted).map((todo) => todo.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });

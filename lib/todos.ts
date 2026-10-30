@@ -36,10 +36,20 @@ export function removeTodo(todos: Todo[], id: number): { todos: Todo[]; deleted:
   return { todos: todos.filter((todo) => todo.id !== id), deleted: { todo: todos[index], index } };
 }
 
+export function removeCompleted(todos: Todo[]): { todos: Todo[]; deleted: DeletedTodo[] } {
+  const deleted = todos.flatMap((todo, index) => (todo.completed ? [{ todo, index }] : []));
+  return { todos: todos.filter((todo) => !todo.completed), deleted };
+}
+
 // Puts a deleted todo back where it was. If a todo added since then took its id, it gets a new one.
 export function restoreTodo(todos: Todo[], { todo, index }: DeletedTodo): Todo[] {
   const restored = todos.some((other) => other.id === todo.id) ? { ...todo, id: nextId(todos) } : todo;
   return [...todos.slice(0, index), restored, ...todos.slice(index)];
+}
+
+// Puts deleted todos back where they were. They must be in list order so each lands at its old position.
+export function restoreTodos(todos: Todo[], deleted: DeletedTodo[]): Todo[] {
+  return deleted.reduce(restoreTodo, todos);
 }
 
 export function loadTodos(): Todo[] {
