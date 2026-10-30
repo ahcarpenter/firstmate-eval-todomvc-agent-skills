@@ -1,6 +1,7 @@
 /* Keep row controls in the tab order: todomvc-app-css hides .destroy with display:none until hover. */
 .todo-list li .destroy,
-.todo-list li .edit-todo {
+.todo-list li .edit-todo,
+.todo-list li .important-toggle {
 	display: block;
 	opacity: 0;
 }
@@ -8,7 +9,10 @@
 .todo-list li:hover .destroy,
 .todo-list li:hover .edit-todo,
 .todo-list li:focus-within .destroy,
-.todo-list li:focus-within .edit-todo {
+.todo-list li:focus-within .edit-todo,
+.todo-list li:hover .important-toggle,
+.todo-list li:focus-within .important-toggle,
+.todo-list li.important .important-toggle {
 	opacity: 1;
 }
 
@@ -37,6 +41,39 @@
 	line-height: 1.6;
 }
 
+.todo-list li .important-toggle {
+	position: absolute;
+	top: 0;
+	right: 90px;
+	bottom: 0;
+	width: 40px;
+	height: 40px;
+	margin: auto 0;
+	font-size: 22px;
+	color: #949494;
+	transition: color 0.2s ease-out;
+}
+
+.todo-list li .important-toggle:hover,
+.todo-list li .important-toggle:focus {
+	color: #484848;
+}
+
+.todo-list li .important-toggle:after {
+	content: '☆';
+	display: block;
+	height: 100%;
+	line-height: 1.6;
+}
+
+.todo-list li.important .important-toggle {
+	color: #c9a227;
+}
+
+.todo-list li.important .important-toggle:after {
+	content: '★';
+}
+
 .todo-list li .view label {
-	padding-right: 100px;
+	padding-right: 140px;
 }

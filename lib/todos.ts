@@ -2,6 +2,8 @@ export type Todo = {
   id: number;
   title: string;
   completed: boolean;
+  // Optional so todos saved before this field existed still load as not important.
+  important?: boolean;
 };
 
 export type Filter = "all" | "active" | "completed";

@@ -7,13 +7,14 @@ type Props = {
   todo: Todo;
   editing: boolean;
   onToggle: () => void;
+  onToggleImportant: () => void;
   onDestroy: () => void;
   onEdit: () => void;
   onSave: (title: string) => void;
   onCancel: () => void;
 };
 
-export default function TodoItem({ todo, editing, onToggle, onDestroy, onEdit, onSave, onCancel }: Props) {
+export default function TodoItem({ todo, editing, onToggle, onToggleImportant, onDestroy, onEdit, onSave, onCancel }: Props) {
   const [editText, setEditText] = useState(todo.title);
   const editButton = useRef<HTMLButtonElement>(null);
   // Set when Enter or Escape ends an edit, so focus returns to the row instead of the page body.
@@ -45,7 +46,7 @@ export default function TodoItem({ todo, editing, onToggle, onDestroy, onEdit, o
     }
   }
 
-  const classes = [todo.completed ? "completed" : "", editing ? "editing" : ""].filter(Boolean).join(" ");
+  const classes = [todo.completed ? "completed" : "", todo.important ? "important" : "", editing ? "editing" : ""].filter(Boolean).join(" ");
 
   return (
     <li className={classes || undefined}>
@@ -60,6 +61,14 @@ export default function TodoItem({ todo, editing, onToggle, onDestroy, onEdit, o
         <label id={titleId} onDoubleClick={startEditing}>
           {todo.title}
         </label>
+        <button
+          type="button"
+          className="important-toggle"
+          onClick={onToggleImportant}
+          aria-label="Important"
+          aria-pressed={todo.important ?? false}
+          aria-describedby={titleId}
+        />
         <button ref={editButton} type="button" className="edit-todo" onClick={startEditing} aria-label={`Edit ${todo.title}`} />
         <button type="button" className="destroy" onClick={onDestroy} aria-label={`Delete ${todo.title}`} />
       </div>

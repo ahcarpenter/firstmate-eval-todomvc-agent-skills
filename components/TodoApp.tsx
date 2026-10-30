@@ -37,6 +37,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     setTodos(todos.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo)));
   }
 
+  function toggleImportant(id: number) {
+    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, important: !todo.important } : todo)));
+  }
+
   function toggleAll(completed: boolean) {
     setTodos(todos.map((todo) => ({ ...todo, completed })));
   }
@@ -102,6 +106,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
                   todo={todo}
                   editing={editingId === todo.id}
                   onToggle={() => toggle(todo.id)}
+                  onToggleImportant={() => toggleImportant(todo.id)}
                   onDestroy={() => destroyAndRefocus(todo.id)}
                   onEdit={() => setEditingId(todo.id)}
                   onSave={(title) => save(todo.id, title)}
