@@ -105,8 +105,22 @@ describe("editTodo", () => {
 
 describe("formatDue", () => {
   it("shows the month and day", () => {
-    expect(formatDue("2026-11-03")).toBe("Due Nov 3");
-    expect(formatDue("2027-01-31")).toBe("Due Jan 31");
+    expect(formatDue("2026-11-03", TODAY)).toBe("Due Nov 3");
+    expect(formatDue("2027-01-31", TODAY)).toBe("Due Jan 31");
+  });
+
+  it("says today and tomorrow for those days", () => {
+    expect(formatDue("2026-10-29", TODAY)).toBe("Due today");
+    expect(formatDue("2026-10-30", TODAY)).toBe("Due tomorrow");
+    expect(formatDue("2026-10-28", TODAY)).toBe("Due Oct 28");
+    expect(formatDue("2026-10-31", TODAY)).toBe("Due Oct 31");
+  });
+
+  it("finds tomorrow across month and year ends", () => {
+    expect(formatDue("2026-11-01", "2026-10-31")).toBe("Due tomorrow");
+    expect(formatDue("2027-01-01", "2026-12-31")).toBe("Due tomorrow");
+    expect(formatDue("2028-02-29", "2028-02-28")).toBe("Due tomorrow");
+    expect(formatDue("2027-03-01", "2027-02-28")).toBe("Due tomorrow");
   });
 });
 

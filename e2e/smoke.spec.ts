@@ -141,3 +141,25 @@ test.describe("editing a todo's due date", () => {
     await expect(page.getByLabel("Change date")).toHaveValue("2026-11-03");
   });
 });
+
+test.describe("due-soon labels", () => {
+  // Late evening in Los Angeles is already the next day in UTC, so the labels must follow the local calendar.
+  test.use({ timezoneId: "America/Los_Angeles" });
+
+  test("says today and tomorrow by the viewer's calendar", async ({ page }) => {
+    await page.clock.setFixedTime(new Date("2026-10-29T23:30:00-07:00"));
+    await page.goto("/");
+    const input = page.getByPlaceholder("What needs to be done?");
+    const due = page.getByLabel("Due date");
+    for (const [title, date] of [
+      ["Pay rent", "2026-10-29"],
+      ["Book flights", "2026-10-30"],
+      ["Renew passport", "2026-10-31"],
+    ]) {
+      await due.fill(date);
+      await input.fill(title);
+      await input.press("Enter");
+    }
+    await expect(page.locator(".todo-list li .todo-due")).toHaveText(["Due today", "Due tomorrow", "Due Oct 31"]);
+  });
+});

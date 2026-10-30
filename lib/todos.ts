@@ -25,7 +25,12 @@ export function pluralize(count: number, word: string): string {
 // Read the date in UTC so the calendar day never shifts with the viewer's time zone.
 const DUE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
-export function formatDue(due: string): string {
+/** "Due today" and "Due tomorrow" relative to `today` (from `localToday`), otherwise "Due Nov 3". */
+export function formatDue(due: string, today: string): string {
+  if (due === today) return "Due today";
+  const tomorrow = new Date(`${today}T00:00:00Z`);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  if (due === tomorrow.toISOString().slice(0, 10)) return "Due tomorrow";
   return `Due ${DUE_FORMAT.format(new Date(`${due}T00:00:00Z`))}`;
 }
 
