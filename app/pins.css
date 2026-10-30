@@ -1,0 +1,28 @@
+/* Pin button sits left of the destroy button; it shows on hover, and always on pinned todos. */
+.todo-list li label {
+  padding-right: 120px;
+}
+
+.todo-list li .pin {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 55px;
+  bottom: 0;
+  height: 30px;
+  margin: auto 0;
+  padding: 0 8px;
+  font-size: 14px;
+  color: #949494;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.todo-list li .pin:hover {
+  color: #484848;
+}
+
+.todo-list li:hover .pin,
+.todo-list li.pinned .pin {
+  display: block;
+}

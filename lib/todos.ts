@@ -2,6 +2,8 @@ export type Todo = {
   id: number;
   title: string;
   completed: boolean;
+  // Absent on todos saved before pinning existed; treat as unpinned.
+  pinned?: boolean;
 };
 
 export type Filter = "all" | "active" | "completed";
@@ -22,6 +24,11 @@ export function filterTodos(todos: Todo[], filter: Filter): Todo[] {
   if (filter === "active") return todos.filter((todo) => !todo.completed);
   if (filter === "completed") return todos.filter((todo) => todo.completed);
   return todos;
+}
+
+// Pinned todos first; Array.prototype.sort is stable, so each group keeps its order.
+export function pinnedFirst(todos: Todo[]): Todo[] {
+  return [...todos].sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
 }
 
 export function loadTodos(): Todo[] {

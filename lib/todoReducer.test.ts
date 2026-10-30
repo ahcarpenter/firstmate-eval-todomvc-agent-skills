@@ -33,6 +33,13 @@ describe("todoReducer", () => {
     expect(todoReducer(todos, { type: "toggleAll", completed: false }).some((todo) => todo.completed)).toBe(false);
   });
 
+  it("pins and unpins one todo", () => {
+    const pinned = todoReducer(todos, { type: "togglePin", id: 2 });
+    expect(pinned[1]).toEqual({ id: 2, title: "Walk the dog", completed: true, pinned: true });
+    expect(pinned[0]).toBe(todos[0]);
+    expect(todoReducer(pinned, { type: "togglePin", id: 2 })[1].pinned).toBe(false);
+  });
+
   it("destroys one todo", () => {
     expect(todoReducer(todos, { type: "destroy", id: 1 }).map((todo) => todo.id)).toEqual([2]);
   });

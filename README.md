@@ -26,7 +26,7 @@ npm run test:e2e  # end-to-end tests (Playwright); builds and starts the app on 
 - `components/TodoApp.tsx` renders the page UI and the new-todo and editing input state.
 - `components/usePersistedTodos.ts` wires the list state to localStorage.
 - `components/TodoItem.tsx` renders one todo and its edit field.
-- `lib/todos.ts` has the `Todo` type, filtering, and localStorage helpers.
+- `lib/todos.ts` has the `Todo` type, filtering, pinned-first ordering, and localStorage helpers.
 - `lib/todoReducer.ts` holds the list state transitions as a pure, unit-tested reducer.
 
 Todos persist in `localStorage` under the `todos-nextjs` key.
