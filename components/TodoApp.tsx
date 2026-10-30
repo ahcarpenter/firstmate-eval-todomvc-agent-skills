@@ -106,6 +106,14 @@ export default function TodoApp({ filter }: { filter: Filter }) {
           <footer className="footer">
             <span className="todo-count">
               <strong>{activeCount}</strong> {pluralize(activeCount, "item")} left
+              {completedCount > 0 && (
+                <>
+                  {" · "}
+                  <span className="completed-count">
+                    <strong>{completedCount}</strong> completed
+                  </span>
+                </>
+              )}
             </span>
             <ul className="filters">
               <li>
