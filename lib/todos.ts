@@ -24,6 +24,20 @@ export function filterTodos(todos: Todo[], filter: Filter): Todo[] {
   return todos;
 }
 
+export type DeletedTodo = { todo: Todo; index: number };
+
+export function removeTodo(todos: Todo[], id: number): { todos: Todo[]; deleted: DeletedTodo | null } {
+  const index = todos.findIndex((todo) => todo.id === id);
+  if (index === -1) return { todos, deleted: null };
+  return { todos: todos.filter((todo) => todo.id !== id), deleted: { todo: todos[index], index } };
+}
+
+export function restoreTodo(todos: Todo[], { todo, index }: DeletedTodo): Todo[] {
+  // A todo added since the deletion may have taken the deleted todo's id.
+  const restored = todos.some((other) => other.id === todo.id) ? { ...todo, id: nextId(todos) } : todo;
+  return [...todos.slice(0, index), restored, ...todos.slice(index)];
+}
+
 export function loadTodos(): Todo[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
