@@ -3,14 +3,23 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import TodoItem from "@/components/TodoItem";
-import { filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
+import { filterTodos, findActiveDuplicate, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
+
+const noticeStyle: React.CSSProperties = {
+  margin: 0,
+  padding: "8px 16px 8px 60px",
+  background: "#fff8e1",
+  color: "#8a6d3b",
+  fontSize: "14px",
+};
 
 export default function TodoApp({ filter }: { filter: Filter }) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [notice, setNotice] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -28,6 +37,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     if (event.key !== ENTER_KEY) return;
     const title = newTitle.trim();
     if (!title) return;
+    const duplicate = findActiveDuplicate(todos, title);
+    if (duplicate) {
+      setNotice(`“${duplicate.title}” is already on your list.`);
+      return;
+    }
     setTodos([...todos, { id: nextId(todos), title, completed: false }]);
     setNewTitle("");
   }
@@ -72,7 +86,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
             placeholder="What needs to be done?"
             autoFocus
             value={newTitle}
-            onChange={(event) => setNewTitle(event.target.value)}
+            onChange={(event) => {
+              setNewTitle(event.target.value);
+              setNotice("");
+            }}
             onKeyDown={addTodo}
           />
         </header>
@@ -86,6 +103,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
               onChange={(event) => toggleAll(event.target.checked)}
             />
             <label htmlFor="toggle-all">Mark all as complete</label>
+            {/* Inside .main so the toggle-all label, positioned against .main's top, stays beside the input. */}
+            <p role="status" style={notice ? noticeStyle : { margin: 0 }}>
+              {notice}
+            </p>
             <ul className="todo-list">
               {shown.map((todo) => (
                 <TodoItem
