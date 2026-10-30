@@ -38,6 +38,16 @@ export function restoreTodo(todos: Todo[], { todo, index }: DeletedTodo): Todo[]
   return [...todos.slice(0, index), restored, ...todos.slice(index)];
 }
 
+export function removeCompleted(todos: Todo[]): { todos: Todo[]; deleted: DeletedTodo[] } {
+  const deleted = todos.flatMap((todo, index) => (todo.completed ? [{ todo, index }] : []));
+  return { todos: todos.filter((todo) => !todo.completed), deleted };
+}
+
+// Restoring in ascending index order puts each todo back where it was before the others.
+export function restoreTodos(todos: Todo[], deleted: DeletedTodo[]): Todo[] {
+  return deleted.reduce(restoreTodo, todos);
+}
+
 export function loadTodos(): Todo[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);

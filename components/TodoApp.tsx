@@ -9,8 +9,9 @@ import {
   loadTodos,
   nextId,
   pluralize,
+  removeCompleted,
   removeTodo,
-  restoreTodo,
+  restoreTodos,
   saveTodos,
   type DeletedTodo,
   type Filter,
@@ -20,12 +21,14 @@ import {
 const ENTER_KEY = "Enter";
 const UNDO_MS = 5000;
 
+type Deletion = { deleted: DeletedTodo[]; message: string };
+
 export default function TodoApp({ filter }: { filter: Filter }) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [deleted, setDeleted] = useState<DeletedTodo | null>(null);
+  const [deleted, setDeleted] = useState<Deletion | null>(null);
   const [undoPaused, setUndoPaused] = useState(false);
 
   useEffect(() => {
@@ -64,13 +67,13 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   function destroy(id: number) {
     const result = removeTodo(todos, id);
     setTodos(result.todos);
-    setDeleted(result.deleted);
+    setDeleted(result.deleted && { deleted: [result.deleted], message: `Deleted “${result.deleted.todo.title}”` });
     setUndoPaused(false);
   }
 
   function undoDelete() {
     if (!deleted) return;
-    setTodos(restoreTodo(todos, deleted));
+    setTodos(restoreTodos(todos, deleted.deleted));
     setDeleted(null);
     setUndoPaused(false);
   }
@@ -86,7 +89,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   }
 
   function clearCompleted() {
-    setTodos(todos.filter((todo) => !todo.completed));
+    const result = removeCompleted(todos);
+    const count = result.deleted.length;
+    setTodos(result.todos);
+    setDeleted({ deleted: result.deleted, message: `Cleared ${count} completed ${pluralize(count, "todo")}` });
+    setUndoPaused(false);
   }
 
   const shown = filterTodos(todos, filter);
@@ -163,7 +170,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
           </footer>
         )}
       </section>
-      <UndoBar title={deleted ? deleted.todo.title : null} onUndo={undoDelete} onPause={setUndoPaused} />
+      <UndoBar message={deleted ? deleted.message : null} onUndo={undoDelete} onPause={setUndoPaused} />
       <footer className="info">
         <p>Double-click to edit a todo</p>
         <p>
