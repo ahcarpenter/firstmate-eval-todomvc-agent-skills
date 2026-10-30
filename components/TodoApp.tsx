@@ -1,9 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import TodoItem from "@/components/TodoItem";
-import { filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
+import UndoToast from "@/components/UndoToast";
+import {
+  filterTodos,
+  loadTodos,
+  nextId,
+  pluralize,
+  removeTodo,
+  restoreTodo,
+  saveTodos,
+  type DeletedTodo,
+  type Filter,
+  type Todo,
+} from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
 
@@ -12,6 +24,8 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   const [loaded, setLoaded] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [deleted, setDeleted] = useState<DeletedTodo | null>(null);
+  const forgetDeleted = useCallback(() => setDeleted(null), []);
 
   useEffect(() => {
     // Read storage after mount so the server render and the first client render match.
@@ -41,7 +55,14 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   }
 
   function destroy(id: number) {
-    setTodos(todos.filter((todo) => todo.id !== id));
+    const result = removeTodo(todos, id);
+    setTodos(result.todos);
+    setDeleted(result.deleted);
+  }
+
+  function undoDelete() {
+    if (deleted) setTodos(restoreTodo(todos, deleted));
+    setDeleted(null);
   }
 
   function save(id: number, title: string) {
@@ -132,6 +153,9 @@ export default function TodoApp({ filter }: { filter: Filter }) {
           </footer>
         )}
       </section>
+      {deleted && (
+        <UndoToast key={deleted.todo.id} title={deleted.todo.title} onUndo={undoDelete} onExpire={forgetDeleted} />
+      )}
       <footer className="info">
         <p>Double-click to edit a todo</p>
         <p>
