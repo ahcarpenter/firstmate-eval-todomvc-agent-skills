@@ -1,0 +1,42 @@
+/* Keep row controls in the tab order: todomvc-app-css hides .destroy with display:none until hover. */
+.todo-list li .destroy,
+.todo-list li .edit-todo {
+	display: block;
+	opacity: 0;
+}
+
+.todo-list li:hover .destroy,
+.todo-list li:hover .edit-todo,
+.todo-list li:focus-within .destroy,
+.todo-list li:focus-within .edit-todo {
+	opacity: 1;
+}
+
+.todo-list li .edit-todo {
+	position: absolute;
+	top: 0;
+	right: 50px;
+	bottom: 0;
+	width: 40px;
+	height: 40px;
+	margin: auto 0;
+	font-size: 22px;
+	color: #949494;
+	transition: color 0.2s ease-out;
+}
+
+.todo-list li .edit-todo:hover,
+.todo-list li .edit-todo:focus {
+	color: #484848;
+}
+
+.todo-list li .edit-todo:after {
+	content: '✎';
+	display: block;
+	height: 100%;
+	line-height: 1.6;
+}
+
+.todo-list li .view label {
+	padding-right: 100px;
+}

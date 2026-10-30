@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TodoItem from "@/components/TodoItem";
 import { filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
 
@@ -12,6 +12,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   const [loaded, setLoaded] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
+  const newTodoInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     // Read storage after mount so the server render and the first client render match.
@@ -44,6 +45,12 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     setTodos(todos.filter((todo) => todo.id !== id));
   }
 
+  function destroyAndRefocus(id: number) {
+    destroy(id);
+    // The focused delete button is about to unmount; keep keyboard focus on the page.
+    newTodoInput.current?.focus();
+  }
+
   function save(id: number, title: string) {
     const trimmed = title.trim();
     if (!trimmed) {
@@ -68,7 +75,9 @@ export default function TodoApp({ filter }: { filter: Filter }) {
         <header className="header">
           <h1>todos</h1>
           <input
+            ref={newTodoInput}
             className="new-todo"
+            aria-label="New todo"
             placeholder="What needs to be done?"
             autoFocus
             value={newTitle}
@@ -93,7 +102,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
                   todo={todo}
                   editing={editingId === todo.id}
                   onToggle={() => toggle(todo.id)}
-                  onDestroy={() => destroy(todo.id)}
+                  onDestroy={() => destroyAndRefocus(todo.id)}
                   onEdit={() => setEditingId(todo.id)}
                   onSave={(title) => save(todo.id, title)}
                   onCancel={() => setEditingId(null)}
@@ -133,7 +142,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
         )}
       </section>
       <footer className="info">
-        <p>Double-click to edit a todo</p>
+        <p>Double-click a todo, or use its edit button, to edit it</p>
         <p>
           Part of <a href="https://todomvc.com">TodoMVC</a>
         </p>
