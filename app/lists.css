@@ -35,11 +35,36 @@
 	border-color: #ce4646;
 }
 
+.lists li {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.lists li button {
+	padding: 3px 5px;
+	color: #777;
+	font: inherit;
+	font-size: 12px;
+	cursor: pointer;
+	border-radius: 3px;
+}
+
+.lists li button:hover:not(:disabled) {
+	color: #ce4646;
+}
+
+.lists li button:disabled {
+	color: #ccc;
+	cursor: default;
+}
+
 .lists label {
 	color: #4d4d4d;
 }
 
-.lists .new-list {
+.lists .new-list,
+.lists .rename-list {
 	width: 140px;
 	padding: 3px 7px;
 	font: inherit;

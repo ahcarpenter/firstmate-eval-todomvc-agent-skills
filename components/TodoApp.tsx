@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ListNav from "@/components/ListNav";
 import TodoItem from "@/components/TodoItem";
-import { createList, loadLists, saveLists, type TodoList } from "@/lib/lists";
+import { createList, deleteList, loadLists, renameList, saveLists, type TodoList } from "@/lib/lists";
 import { filterTodos, nextId, pluralize, type Filter, type Todo } from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
@@ -43,6 +43,14 @@ export default function TodoApp({ listId, filter }: { listId?: string; filter: F
     const created = createList(lists, name);
     updateLists([...lists, created]);
     router.push(`/lists/${created.id}`);
+  }
+
+  function removeList(id: string) {
+    const next = deleteList(lists, id);
+    if (next === lists) return;
+    updateLists(next);
+    // Without a listId the first list shows, which is already the first remaining one.
+    if (listId !== undefined && id === list?.id) router.replace(`/lists/${next[0].id}`);
   }
 
   function addTodo(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -87,7 +95,13 @@ export default function TodoApp({ listId, filter }: { listId?: string; filter: F
   return (
     <>
       <section className="todoapp">
-        <ListNav lists={lists} currentId={list?.id} onCreate={addList} />
+        <ListNav
+          lists={lists}
+          currentId={list?.id}
+          onCreate={addList}
+          onRename={(id, name) => updateLists(renameList(lists, id, name))}
+          onDelete={removeList}
+        />
         {loaded && !list && <p className="missing-list">This list does not exist. Pick a list or create one.</p>}
         <header className="header">
           <h1>todos</h1>

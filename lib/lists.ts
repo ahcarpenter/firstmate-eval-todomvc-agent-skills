@@ -30,6 +30,17 @@ export function createList(lists: TodoList[], name: string): TodoList {
   return { id: listId(lists, name), name, todos: [] };
 }
 
+// The id stays the same so links to the list keep working.
+export function renameList(lists: TodoList[], id: string, name: string): TodoList[] {
+  return lists.map((list) => (list.id === id ? { ...list, name } : list));
+}
+
+// The last list is kept, so there is always a list to show.
+export function deleteList(lists: TodoList[], id: string): TodoList[] {
+  if (lists.length <= 1) return lists;
+  return lists.filter((list) => list.id !== id);
+}
+
 // Before lists existed, todos were stored on their own under STORAGE_KEY.
 // Those todos become a list called "Todos" the first time lists are read.
 export function parseLists(raw: string | null, legacyRaw: string | null): TodoList[] {

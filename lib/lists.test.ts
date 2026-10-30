@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createList, listId, parseLists, type TodoList } from "./lists";
+import { createList, deleteList, listId, parseLists, renameList, type TodoList } from "./lists";
 
 const todo = { id: 1, title: "Buy milk", completed: false };
 
@@ -41,5 +41,30 @@ describe("listId", () => {
 describe("createList", () => {
   it("creates an empty list with the given name", () => {
     expect(createList([], "Work")).toEqual({ id: "work", name: "Work", todos: [] });
+  });
+});
+
+describe("renameList", () => {
+  it("renames only the given list and keeps its id and todos", () => {
+    const lists: TodoList[] = [
+      { id: "work", name: "Work", todos: [todo] },
+      { id: "home", name: "Home", todos: [] },
+    ];
+    expect(renameList(lists, "work", "Job")).toEqual([
+      { id: "work", name: "Job", todos: [todo] },
+      { id: "home", name: "Home", todos: [] },
+    ]);
+  });
+});
+
+describe("deleteList", () => {
+  it("removes the given list", () => {
+    const lists = [createList([], "Work"), createList([], "Home")];
+    expect(deleteList(lists, "work")).toEqual([lists[1]]);
+  });
+
+  it("keeps the last list", () => {
+    const lists = [createList([], "Work")];
+    expect(deleteList(lists, "work")).toBe(lists);
   });
 });

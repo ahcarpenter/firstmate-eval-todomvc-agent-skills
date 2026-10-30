@@ -65,3 +65,62 @@ test("explains when a list does not exist", async ({ page }) => {
   await expect(page.getByText("This list does not exist.")).toBeVisible();
   await expect(lists(page)).toHaveText(["Todos"]);
 });
+
+test("renames a list with Enter and cancels with Escape", async ({ page }) => {
+  await page.goto("/");
+  await createList(page, "Work");
+  await addTodo(page, "Write report");
+
+  await page.getByRole("button", { name: "Rename Work" }).click();
+  const field = page.getByLabel("Rename list");
+  await expect(field).toBeFocused();
+  await expect(field).toHaveValue("Work");
+  await field.fill("Job");
+  await field.press("Escape");
+  await expect(field).toHaveCount(0);
+  await expect(lists(page)).toHaveText(["Todos", "Work"]);
+
+  await page.getByRole("button", { name: "Rename Work" }).click();
+  await page.getByLabel("Rename list").fill("Job");
+  await page.getByLabel("Rename list").press("Enter");
+  await expect(lists(page)).toHaveText(["Todos", "Job"]);
+  await expect(page.getByRole("button", { name: "Rename Job" })).toBeVisible();
+  await expect(page).toHaveURL("/lists/work");
+
+  await page.reload();
+  await expect(lists(page)).toHaveText(["Todos", "Job"]);
+  await expect(page.locator(".todo-list li")).toHaveText(["Write report"]);
+});
+
+test("deletes a list after confirming and keeps the last list", async ({ page }) => {
+  await page.goto("/");
+  await addTodo(page, "Buy milk");
+  await createList(page, "Work");
+  await addTodo(page, "Write report");
+
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.getByRole("button", { name: "Delete Work" }).click();
+  await expect(lists(page)).toHaveText(["Todos", "Work"]);
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete Work" }).click();
+  await expect(lists(page)).toHaveText(["Todos"]);
+  await expect(page).toHaveURL("/lists/todos");
+  await expect(page.locator(".todo-list li")).toHaveText(["Buy milk"]);
+  await expect(page.getByRole("button", { name: "Delete Todos" })).toBeDisabled();
+
+  await page.reload();
+  await expect(lists(page)).toHaveText(["Todos"]);
+  await createList(page, "Work");
+  await expect(page.locator(".todo-list li")).toHaveCount(0);
+});
+
+test("deleting another list keeps the open list", async ({ page }) => {
+  await page.goto("/");
+  await createList(page, "Work");
+  await page.goto("/lists/todos");
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete Work" }).click();
+  await expect(lists(page)).toHaveText(["Todos"]);
+  await expect(page).toHaveURL("/lists/todos");
+});
