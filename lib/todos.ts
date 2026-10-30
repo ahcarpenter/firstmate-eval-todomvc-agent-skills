@@ -11,7 +11,7 @@ export const FILTERS: Filter[] = ["all", "active", "completed"];
 export const STORAGE_KEY = "todos-nextjs";
 
 export function nextId(todos: Todo[]): number {
-  return todos.length + 1;
+  return Math.max(0, ...todos.map((todo) => todo.id)) + 1;
 }
 
 export function pluralize(count: number, word: string): string {
