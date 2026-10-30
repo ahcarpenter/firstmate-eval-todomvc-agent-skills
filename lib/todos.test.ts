@@ -14,6 +14,10 @@ describe("nextId", () => {
   it("follows the existing todos", () => {
     expect(nextId(todos)).toBe(3);
   });
+
+  it("never reuses an id after a deletion", () => {
+    expect(nextId([{ id: 2, title: "Walk the dog", completed: true }])).toBe(3);
+  });
 });
 
 describe("pluralize", () => {
