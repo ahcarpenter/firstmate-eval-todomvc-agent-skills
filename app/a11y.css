@@ -9,3 +9,36 @@
 .todo-list li:focus-within .destroy {
   opacity: 1;
 }
+
+/* The Important star sits left of the delete button; keep the title clear of both. */
+.todo-list li label {
+  padding-right: 100px;
+}
+
+.todo-list li .important-toggle {
+  position: absolute;
+  top: 0;
+  right: 50px;
+  bottom: 0;
+  width: 40px;
+  height: 40px;
+  margin: auto 0;
+  font-size: 26px;
+  color: #949494;
+}
+
+.todo-list li .important-toggle::after {
+  content: "☆";
+}
+
+.todo-list li .important-toggle[aria-pressed="true"] {
+  color: #c99a00;
+}
+
+.todo-list li .important-toggle[aria-pressed="true"]::after {
+  content: "★";
+}
+
+.todo-list li .important-toggle:focus-visible {
+  outline: 2px solid #c99a00;
+}

@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
-import { filterTodos, nextId, pluralize, type Todo } from "./todos";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { filterTodos, loadTodos, nextId, pluralize, type Todo } from "./todos";
 
 const todos: Todo[] = [
-  { id: 1, title: "Buy milk", completed: false },
-  { id: 2, title: "Walk the dog", completed: true },
+  { id: 1, title: "Buy milk", completed: false, important: false },
+  { id: 2, title: "Walk the dog", completed: true, important: false },
 ];
 
 describe("nextId", () => {
@@ -38,5 +38,25 @@ describe("filterTodos", () => {
 
   it("returns only completed todos", () => {
     expect(filterTodos(todos, "completed").map((todo) => todo.id)).toEqual([2]);
+  });
+});
+
+describe("loadTodos", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  function stubStorage(value: string | null) {
+    vi.stubGlobal("window", { localStorage: { getItem: () => value } });
+  }
+
+  it("keeps important marks", () => {
+    stubStorage(JSON.stringify([{ id: 1, title: "Buy milk", completed: false, important: true }]));
+    expect(loadTodos()[0].important).toBe(true);
+  });
+
+  it("treats todos saved without an important mark as not important", () => {
+    stubStorage(JSON.stringify([{ id: 1, title: "Buy milk", completed: false }]));
+    expect(loadTodos()[0].important).toBe(false);
   });
 });

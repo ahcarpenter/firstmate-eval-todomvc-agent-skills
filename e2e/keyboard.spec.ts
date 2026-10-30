@@ -15,6 +15,7 @@ test("names every todo control", async ({ page }) => {
   await expect(page.getByRole("checkbox", { name: "Buy milk" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Edit Buy milk" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Delete Buy milk" })).toBeAttached();
+  await expect(page.getByRole("button", { name: "Important", exact: true })).toBeVisible();
 });
 
 test("toggles a todo with the keyboard", async ({ page }) => {
@@ -57,11 +58,33 @@ test("keeps focus where the user moved it when an edit ends on blur", async ({ p
 });
 
 test("deletes a todo with the keyboard", async ({ page }) => {
-  await page.getByRole("button", { name: "Edit Buy milk" }).focus();
+  await page.getByRole("button", { name: "Important", exact: true }).focus();
   await page.keyboard.press("Tab");
   const destroy = page.getByRole("button", { name: "Delete Buy milk" });
   await expect(destroy).toBeFocused();
   await expect(destroy).toHaveCSS("opacity", "1");
   await page.keyboard.press("Enter");
   await expect(page.locator(".todo-list li")).toHaveCount(0);
+});
+
+test("marks a todo important with the keyboard and keeps it across reloads", async ({ page }) => {
+  await page.getByRole("button", { name: "Edit Buy milk" }).focus();
+  await page.keyboard.press("Tab");
+  const important = page.getByRole("button", { name: "Important", exact: true });
+  await expect(important).toBeFocused();
+  await expect(important).toHaveAccessibleDescription("Buy milk");
+  await expect(important).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator(".todo-list li")).not.toHaveClass(/important/);
+
+  await page.keyboard.press("Enter");
+  await expect(important).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".todo-list li")).toHaveClass(/important/);
+
+  await page.reload();
+  await expect(important).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".todo-list li")).toHaveClass(/important/);
+
+  await important.focus();
+  await page.keyboard.press("Space");
+  await expect(important).toHaveAttribute("aria-pressed", "false");
 });
