@@ -32,3 +32,26 @@
   font-size: 14px;
   color: #757575;
 }
+
+.todo-list li .todo-overdue {
+  margin-left: 8px;
+  font-weight: 600;
+  color: #b83f45;
+}
+
+/* The overdue count sits under the item count, clear of the centered filters. */
+.footer {
+  display: flow-root;
+  height: auto;
+}
+
+.footer .overdue-count {
+  float: left;
+  clear: left;
+  margin-top: 4px;
+  color: #b83f45;
+}
+
+.footer .overdue-count strong {
+  font-weight: 300;
+}

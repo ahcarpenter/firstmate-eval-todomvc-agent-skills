@@ -3,7 +3,17 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import TodoItem from "@/components/TodoItem";
-import { filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
+import {
+  filterTodos,
+  isOverdue,
+  loadTodos,
+  nextId,
+  pluralize,
+  saveTodos,
+  todayISO,
+  type Filter,
+  type Todo,
+} from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
 
@@ -62,8 +72,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     setTodos(todos.filter((todo) => !todo.completed));
   }
 
-  const shown = filterTodos(todos, filter);
+  const today = todayISO();
+  const shown = filterTodos(todos, filter, today);
   const activeCount = todos.filter((todo) => !todo.completed).length;
+  const overdueCount = todos.filter((todo) => isOverdue(todo, today)).length;
   const completedCount = todos.length - activeCount;
 
   return (
@@ -99,6 +111,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
                 <TodoItem
                   key={todo.id}
                   todo={todo}
+                  overdue={isOverdue(todo, today)}
                   editing={editingId === todo.id}
                   onToggle={() => toggle(todo.id)}
                   onDestroy={() => destroy(todo.id)}
@@ -131,12 +144,20 @@ export default function TodoApp({ filter }: { filter: Filter }) {
                   Completed
                 </Link>
               </li>
+              <li>
+                <Link href="/overdue" className={filter === "overdue" ? "selected" : undefined}>
+                  Overdue
+                </Link>
+              </li>
             </ul>
             {completedCount > 0 && (
               <button className="clear-completed" onClick={clearCompleted}>
                 Clear completed
               </button>
             )}
+            <span className="overdue-count">
+              <strong>{overdueCount}</strong> overdue
+            </span>
           </footer>
         )}
       </section>
