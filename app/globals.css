@@ -26,3 +26,26 @@
   font-size: 14px;
   color: #777;
 }
+
+.todo-list li .overdue-label {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 0 6px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: #b83f45;
+}
+
+/* Let the footer grow to fit the overdue count under the items-left count. */
+.footer {
+  display: flow-root;
+  height: auto;
+  min-height: 20px;
+}
+
+.todo-count .overdue-count {
+  display: block;
+  color: #b83f45;
+}

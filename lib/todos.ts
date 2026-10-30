@@ -6,9 +6,9 @@ export type Todo = {
   dueDate?: string;
 };
 
-export type Filter = "all" | "active" | "completed";
+export type Filter = "all" | "active" | "completed" | "overdue";
 
-export const FILTERS: Filter[] = ["all", "active", "completed"];
+export const FILTERS: Filter[] = ["all", "active", "completed", "overdue"];
 
 export const STORAGE_KEY = "todos-nextjs";
 
@@ -22,16 +22,35 @@ export function pluralize(count: number, word: string): string {
 
 const DUE_DATE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
-export function formatDueDate(dueDate: string | undefined): string | null {
+function parseDueDate(dueDate: string | undefined): Date | null {
   if (!dueDate || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) return null;
-  // A bare YYYY-MM-DD parses as UTC midnight, so format in UTC to keep the same day.
+  // A bare YYYY-MM-DD parses as UTC midnight.
   const date = new Date(dueDate);
-  return Number.isNaN(date.getTime()) ? null : `Due ${DUE_DATE_FORMAT.format(date)}`;
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
-export function filterTodos(todos: Todo[], filter: Filter): Todo[] {
+export function formatDueDate(dueDate: string | undefined): string | null {
+  const date = parseDueDate(dueDate);
+  // Format in UTC to keep the same calendar day the date was parsed as.
+  return date ? `Due ${DUE_DATE_FORMAT.format(date)}` : null;
+}
+
+// Today's calendar day in the user's time zone, as YYYY-MM-DD.
+export function localDateString(now: Date): string {
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
+// `today` is YYYY-MM-DD, so comparing the strings compares the days.
+export function isOverdue(todo: Todo, today: string): boolean {
+  return !todo.completed && parseDueDate(todo.dueDate) !== null && todo.dueDate! < today;
+}
+
+export function filterTodos(todos: Todo[], filter: Filter, today: string): Todo[] {
   if (filter === "active") return todos.filter((todo) => !todo.completed);
   if (filter === "completed") return todos.filter((todo) => todo.completed);
+  if (filter === "overdue") return todos.filter((todo) => isOverdue(todo, today));
   return todos;
 }
 
