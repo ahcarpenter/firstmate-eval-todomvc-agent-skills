@@ -8,8 +8,9 @@ import {
   loadTodos,
   nextId,
   pluralize,
+  removeCompleted,
   removeTodo,
-  restoreTodo,
+  restoreTodos,
   saveTodos,
   UNDO_DELETE_MS,
   type DeletedTodo,
@@ -24,7 +25,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   const [loaded, setLoaded] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [lastDeleted, setLastDeleted] = useState<DeletedTodo | null>(null);
+  const [lastDeleted, setLastDeleted] = useState<DeletedTodo[]>([]);
 
   useEffect(() => {
     // Read storage after mount so the server render and the first client render match.
@@ -38,8 +39,8 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   }, [todos, loaded]);
 
   useEffect(() => {
-    if (!lastDeleted) return;
-    const timer = setTimeout(() => setLastDeleted(null), UNDO_DELETE_MS);
+    if (lastDeleted.length === 0) return;
+    const timer = setTimeout(() => setLastDeleted([]), UNDO_DELETE_MS);
     return () => clearTimeout(timer);
   }, [lastDeleted]);
 
@@ -62,13 +63,12 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   function destroy(id: number) {
     const { todos: remaining, deleted } = removeTodo(todos, id);
     setTodos(remaining);
-    setLastDeleted(deleted);
+    setLastDeleted(deleted ? [deleted] : []);
   }
 
   function undoDelete() {
-    if (!lastDeleted) return;
-    setTodos(restoreTodo(todos, lastDeleted));
-    setLastDeleted(null);
+    setTodos(restoreTodos(todos, lastDeleted));
+    setLastDeleted([]);
   }
 
   function save(id: number, title: string) {
@@ -82,7 +82,9 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   }
 
   function clearCompleted() {
-    setTodos(todos.filter((todo) => !todo.completed));
+    const { todos: remaining, deleted } = removeCompleted(todos);
+    setTodos(remaining);
+    setLastDeleted(deleted);
   }
 
   const shown = filterTodos(todos, filter);
@@ -159,9 +161,15 @@ export default function TodoApp({ filter }: { filter: Filter }) {
           </footer>
         )}
       </section>
-      {lastDeleted && (
+      {lastDeleted.length > 0 && (
         <div className="undo-delete" role="status">
-          <span>Deleted &ldquo;{lastDeleted.todo.title}&rdquo;</span>
+          <span>
+            {lastDeleted.length === 1 ? (
+              <>Deleted &ldquo;{lastDeleted[0].todo.title}&rdquo;</>
+            ) : (
+              <>Deleted {lastDeleted.length} completed todos</>
+            )}
+          </span>
           <button onClick={undoDelete}>Undo</button>
         </div>
       )}

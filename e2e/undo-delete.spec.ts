@@ -28,6 +28,37 @@ test("undoes a delete in place", async ({ page }) => {
   await expect(page.locator(".todo-list li")).toHaveText(["Buy milk", "Walk the dog", "Read a book"]);
 });
 
+async function toggleTodo(page: Page, title: string) {
+  await page.locator(".todo-list li").filter({ hasText: title }).locator(".toggle").check();
+}
+
+test("undoes clearing completed todos in place", async ({ page }) => {
+  await page.goto("/");
+  await addTodos(page, ["Buy milk", "Walk the dog", "Read a book", "Water plants"]);
+  await toggleTodo(page, "Buy milk");
+  await toggleTodo(page, "Read a book");
+  await page.getByRole("button", { name: "Clear completed" }).click();
+  await expect(page.locator(".todo-list li")).toHaveText(["Walk the dog", "Water plants"]);
+  await expect(page.getByRole("status")).toContainText("Deleted 2 completed todos");
+
+  await page.getByRole("button", { name: "Undo" }).click();
+  const items = page.locator(".todo-list li");
+  await expect(items).toHaveText(["Buy milk", "Walk the dog", "Read a book", "Water plants"]);
+  for (const [title, done] of [
+    ["Buy milk", true],
+    ["Walk the dog", false],
+    ["Read a book", true],
+    ["Water plants", false],
+  ] as const) {
+    const toggle = items.filter({ hasText: title }).locator(".toggle");
+    await (done ? expect(toggle).toBeChecked() : expect(toggle).not.toBeChecked());
+  }
+  await expect(page.getByRole("status")).toHaveCount(0);
+  await page.reload();
+  await expect(items).toHaveText(["Buy milk", "Walk the dog", "Read a book", "Water plants"]);
+  await expect(page.locator(".todo-count")).toHaveText("2 items left");
+});
+
 test("restores the last todo after the list empties", async ({ page }) => {
   await page.goto("/");
   await addTodos(page, ["Buy milk"]);

@@ -25,8 +25,8 @@ npm run test:e2e  # end-to-end tests (Playwright); builds and starts the app on 
 - `app/[[...filter]]/page.tsx` serves `/`, `/active`, and `/completed`.
 - `components/TodoApp.tsx` holds the list state, persistence, and the page UI.
 - `components/TodoItem.tsx` renders one todo and its edit field.
-- `lib/todos.ts` has the `Todo` type, filtering, delete/undo, and localStorage helpers.
+- `lib/todos.ts` has the `Todo` type, filtering, delete/clear/undo, and localStorage helpers.
 
 Todos persist in `localStorage` under the `todos-nextjs` key.
 
-After a todo is deleted, an Undo button shows for five seconds and puts it back where it was.
+After a todo is deleted, or completed todos are cleared, an Undo button shows for five seconds and puts them back where they were.

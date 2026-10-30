@@ -54,3 +54,16 @@ export function restoreTodo(todos: Todo[], { todo, index }: DeletedTodo): Todo[]
   const at = Math.min(index, todos.length);
   return [...todos.slice(0, at), todo, ...todos.slice(at)];
 }
+
+export function removeCompleted(todos: Todo[]): { todos: Todo[]; deleted: DeletedTodo[] } {
+  const deleted: DeletedTodo[] = [];
+  todos.forEach((todo, index) => {
+    if (todo.completed) deleted.push({ todo, index });
+  });
+  return { todos: todos.filter((todo) => !todo.completed), deleted };
+}
+
+// Reinserting in ascending original index puts each todo back where it was.
+export function restoreTodos(todos: Todo[], deleted: DeletedTodo[]): Todo[] {
+  return [...deleted].sort((a, b) => a.index - b.index).reduce(restoreTodo, todos);
+}
