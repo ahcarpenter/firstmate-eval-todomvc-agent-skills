@@ -48,3 +48,31 @@ test("repairs duplicate ids saved by earlier versions", async ({ page }) => {
   await expect(items.filter({ hasText: "Three" }).locator(".toggle")).not.toBeChecked();
   await expect(page.locator(".todo-count")).toHaveText("2 items left");
 });
+
+test("duplicates a todo below the original and keeps the copy after a reload", async ({ page }) => {
+  await page.goto("/");
+  const input = page.getByPlaceholder("What needs to be done?");
+  for (const title of ["One", "Two"]) {
+    await input.fill(title);
+    await input.press("Enter");
+  }
+  const items = page.locator(".todo-list li");
+  await items.filter({ hasText: "One" }).locator(".toggle").check();
+  await items.filter({ hasText: "One" }).hover();
+  await items.filter({ hasText: "One" }).getByRole("button", { name: "Duplicate" }).click();
+  await expect(items).toHaveText(["One", "One", "Two"]);
+  await expect(items.nth(1).locator(".toggle")).not.toBeChecked();
+  await expect(page.locator(".todo-count")).toHaveText("2 items left");
+
+  await items.nth(1).hover();
+  await items.nth(1).locator(".destroy").click();
+  await expect(items).toHaveText(["One", "Two"]);
+  await expect(items.nth(0).locator(".toggle")).toBeChecked();
+
+  await items.filter({ hasText: "Two" }).hover();
+  await items.filter({ hasText: "Two" }).getByRole("button", { name: "Duplicate" }).click();
+  await page.reload();
+  await expect(items).toHaveText(["One", "Two", "Two"]);
+  await items.nth(2).locator(".toggle").check();
+  await expect(items.nth(1).locator(".toggle")).not.toBeChecked();
+});
