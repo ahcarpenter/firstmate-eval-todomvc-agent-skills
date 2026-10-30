@@ -39,6 +39,20 @@
   color: #b83f45;
 }
 
+/* Level with the due date row, which stays short however long the title wraps. */
+.todo-list li .snooze {
+  position: absolute;
+  right: 56px;
+  bottom: 16px;
+  font-size: 14px;
+  color: #b83f45;
+  cursor: pointer;
+}
+
+.todo-list li .snooze:hover {
+  text-decoration: underline;
+}
+
 /* The overdue count sits under the item count, clear of the centered filters. */
 .footer {
   display: flow-root;

@@ -11,6 +11,7 @@ import {
   pluralize,
   saveTodos,
   todayISO,
+  tomorrowISO,
   type Filter,
   type Todo,
 } from "@/lib/todos";
@@ -56,6 +57,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
 
   function destroy(id: number) {
     setTodos(todos.filter((todo) => todo.id !== id));
+  }
+
+  function snooze(id: number) {
+    const due = tomorrowISO();
+    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, due } : todo)));
   }
 
   function save(id: number, title: string) {
@@ -115,6 +121,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
                   editing={editingId === todo.id}
                   onToggle={() => toggle(todo.id)}
                   onDestroy={() => destroy(todo.id)}
+                  onSnooze={() => snooze(todo.id)}
                   onEdit={() => setEditingId(todo.id)}
                   onSave={(title) => save(todo.id, title)}
                   onCancel={() => setEditingId(null)}

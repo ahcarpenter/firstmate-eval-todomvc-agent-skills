@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, formatDue, isOverdue, nextId, pluralize, todayISO, type Todo } from "./todos";
+import { filterTodos, formatDue, isOverdue, nextId, pluralize, todayISO, tomorrowISO, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -74,6 +74,23 @@ describe("isOverdue", () => {
 describe("todayISO", () => {
   it("uses the local calendar date", () => {
     expect(todayISO(new Date(2026, 0, 5, 23, 30))).toBe("2026-01-05");
+  });
+});
+
+describe("tomorrowISO", () => {
+  it("returns the next local day", () => {
+    expect(tomorrowISO(new Date(2026, 10, 5, 12))).toBe("2026-11-06");
+  });
+
+  it("rolls over the end of a month and year", () => {
+    expect(tomorrowISO(new Date(2026, 10, 30, 23, 59))).toBe("2026-12-01");
+    expect(tomorrowISO(new Date(2026, 11, 31))).toBe("2027-01-01");
+  });
+
+  it("makes an overdue todo no longer overdue", () => {
+    const now = new Date(2026, 10, 5, 12);
+    const snoozed = { id: 1, title: "Pay rent", completed: false, due: tomorrowISO(now) };
+    expect(isOverdue(snoozed, todayISO(now))).toBe(false);
   });
 });
 

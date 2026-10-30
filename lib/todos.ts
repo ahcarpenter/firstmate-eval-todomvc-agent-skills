@@ -35,6 +35,11 @@ export function todayISO(now: Date = new Date()): string {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
+// Tomorrow's local calendar date. Date rolls the day over month and year ends.
+export function tomorrowISO(now: Date = new Date()): string {
+  return todayISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
+}
+
 export function isOverdue(todo: Todo, today: string): boolean {
   // YYYY-MM-DD strings sort in calendar order.
   return !todo.completed && todo.due !== undefined && todo.due < today;
