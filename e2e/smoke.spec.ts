@@ -9,7 +9,11 @@ test("adds a todo", async ({ page }) => {
   await expect(page.locator(".todo-count")).toHaveText("1 item left");
 });
 
+// Pin "today" so due dates stay on the same side of it whenever the suite runs.
+const TODAY = new Date(2026, 9, 29, 12);
+
 test("adds a todo with a due date that survives a reload", async ({ page }) => {
+  await page.clock.setFixedTime(TODAY);
   await page.goto("/");
   await page.getByLabel("Due date").fill("2026-11-03");
   const input = page.getByPlaceholder("What needs to be done?");
@@ -21,4 +25,31 @@ test("adds a todo with a due date that survives a reload", async ({ page }) => {
   await expect(page.getByLabel("Due date")).toHaveValue("");
   await page.reload();
   await expect(page.locator(".todo-list li .todo-due")).toHaveText(["Due Nov 3"]);
+});
+
+test("flags overdue todos, counts them, and filters to them", async ({ page }) => {
+  await page.clock.setFixedTime(TODAY);
+  await page.goto("/");
+  const input = page.getByPlaceholder("What needs to be done?");
+  const due = page.getByLabel("Due date");
+  for (const [title, date] of [
+    ["Pay rent", "2026-10-28"],
+    ["Book flights", "2026-10-29"],
+    ["Renew passport", "2026-10-01"],
+    ["Buy milk", ""],
+  ]) {
+    await due.fill(date);
+    await input.fill(title);
+    await input.press("Enter");
+  }
+  await expect(page.locator(".todo-list li .todo-overdue")).toHaveText(["Overdue", "Overdue"]);
+  await expect(page.locator(".todo-count")).toHaveText("4 items left2 overdue");
+
+  await page.getByRole("link", { name: "Overdue" }).click();
+  await expect(page).toHaveURL("/overdue");
+  await expect(page.locator(".todo-list li label")).toHaveText(["Pay rentDue Oct 28Overdue", "Renew passportDue Oct 1Overdue"]);
+
+  await page.locator(".todo-list li").first().locator(".toggle").click();
+  await expect(page.locator(".todo-list li label")).toHaveText(["Renew passportDue Oct 1Overdue"]);
+  await expect(page.locator(".todo-count")).toHaveText("3 items left1 overdue");
 });

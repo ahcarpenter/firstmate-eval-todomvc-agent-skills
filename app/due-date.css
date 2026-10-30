@@ -29,3 +29,26 @@
   font-size: 14px;
   color: #6b6b6b;
 }
+
+.todo-overdue {
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: #b83f45;
+  color: #fff;
+  font-size: 12px;
+}
+
+/* The centered filters leave no room beside the item count, so the overdue count
+   takes its own line and the footer grows around the floated count. */
+.footer {
+  height: auto;
+  min-height: 20px;
+  display: flow-root;
+}
+
+.overdue-count {
+  display: block;
+  margin-top: 4px;
+  color: #b83f45;
+}

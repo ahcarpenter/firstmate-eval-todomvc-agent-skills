@@ -3,7 +3,17 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import TodoItem from "@/components/TodoItem";
-import { filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
+import {
+  filterTodos,
+  isOverdue,
+  loadTodos,
+  localToday,
+  nextId,
+  pluralize,
+  saveTodos,
+  type Filter,
+  type Todo,
+} from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
 
@@ -62,8 +72,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     setTodos(todos.filter((todo) => !todo.completed));
   }
 
-  const shown = filterTodos(todos, filter);
+  // Todos load after mount, so the server render never sees a date-dependent list.
+  const today = localToday();
+  const shown = filterTodos(todos, filter, today);
   const activeCount = todos.filter((todo) => !todo.completed).length;
+  const overdueCount = todos.filter((todo) => isOverdue(todo, today)).length;
   const completedCount = todos.length - activeCount;
 
   return (
@@ -106,6 +119,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
                 <TodoItem
                   key={todo.id}
                   todo={todo}
+                  overdue={isOverdue(todo, today)}
                   editing={editingId === todo.id}
                   onToggle={() => toggle(todo.id)}
                   onDestroy={() => destroy(todo.id)}
@@ -121,6 +135,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
           <footer className="footer">
             <span className="todo-count">
               <strong>{activeCount}</strong> {pluralize(activeCount, "item")} left
+              {overdueCount > 0 && <span className="overdue-count">{overdueCount} overdue</span>}
             </span>
             <ul className="filters">
               <li>
@@ -136,6 +151,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
               <li>
                 <Link href="/completed" className={filter === "completed" ? "selected" : undefined}>
                   Completed
+                </Link>
+              </li>
+              <li>
+                <Link href="/overdue" className={filter === "overdue" ? "selected" : undefined}>
+                  Overdue
                 </Link>
               </li>
             </ul>
