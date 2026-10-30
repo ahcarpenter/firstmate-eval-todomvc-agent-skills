@@ -31,6 +31,8 @@ A todo's due date shows as "Due today" or "Due tomorrow" by the browser's calend
 
 A todo is overdue when it is not completed and its due date is before today in the browser's time zone.
 
+While any todo is overdue, the footer's "Move overdue to today" button sets every overdue todo's due date to today.
+
 The footer's "Sort by date" checkbox shows todos earliest due date first, with undated todos last and ties in their usual order, within every filter.
 
 The "Search" field above the list shows only todos whose title contains the text, ignoring letter case, within the current filter. The items-left count still counts every active todo. Switching filters clears the search.

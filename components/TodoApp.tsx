@@ -12,6 +12,7 @@ import {
   localDateString,
   nextId,
   pluralize,
+  rescheduleOverdue,
   saveSortByDate,
   saveTodos,
   searchTodos,
@@ -78,6 +79,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
       setTodos(todos.map((todo) => (todo.id === id ? editTodo(todo, trimmed, dueDate) : todo)));
     }
     setEditingId(null);
+  }
+
+  function moveOverdueToToday() {
+    setTodos(rescheduleOverdue(todos, today));
   }
 
   function clearCompleted() {
@@ -175,6 +180,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
             {completedCount > 0 && (
               <button className="clear-completed" onClick={clearCompleted}>
                 Clear completed
+              </button>
+            )}
+            {overdueCount > 0 && (
+              <button className="move-overdue" onClick={moveOverdueToToday}>
+                Move overdue to today
               </button>
             )}
             <label className="sort-by-date">

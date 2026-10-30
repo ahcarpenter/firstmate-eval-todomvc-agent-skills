@@ -55,6 +55,11 @@ export function isOverdue(todo: Todo, today: string): boolean {
   return !todo.completed && parseDueDate(todo.dueDate) !== null && todo.dueDate! < today;
 }
 
+// Sets every overdue todo's due date to today; other todos stay the same objects.
+export function rescheduleOverdue(todos: Todo[], today: string): Todo[] {
+  return todos.map((todo) => (isOverdue(todo, today) ? { ...todo, dueDate: today } : todo));
+}
+
 // Applies an edit; an empty due date removes the todo's date.
 export function editTodo(todo: Todo, title: string, dueDate: string): Todo {
   const edited: Todo = { ...todo, title };

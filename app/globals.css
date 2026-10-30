@@ -74,6 +74,20 @@
   padding-top: 12px;
 }
 
+/* Its own row under the filters, positioned above the footer's shadow like the sort row. */
+.footer .move-overdue {
+  position: relative;
+  display: block;
+  clear: both;
+  margin: 12px auto 0;
+  color: #b83f45;
+  cursor: pointer;
+}
+
+.footer .move-overdue:hover {
+  text-decoration: underline;
+}
+
 .main .search {
   display: flex;
   align-items: center;

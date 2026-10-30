@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { editTodo, filterTodos, formatDueDate, isOverdue, localDateString, nextId, pluralize, searchTodos, sortByDueDate, type Todo } from "./todos";
+import { editTodo, filterTodos, formatDueDate, isOverdue, localDateString, nextId, pluralize, rescheduleOverdue, searchTodos, sortByDueDate, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -182,5 +182,26 @@ describe("searchTodos", () => {
 
   it("returns nothing when no title matches", () => {
     expect(searchTodos(dated, "zebra")).toEqual([]);
+  });
+});
+
+describe("rescheduleOverdue", () => {
+  it("moves every overdue todo to today", () => {
+    const moved = rescheduleOverdue([...dated, { id: 6, title: "Renew passport", completed: false, dueDate: "2025-12-31" }], today);
+    expect(moved.filter((todo) => todo.id === 3 || todo.id === 6).map((todo) => todo.dueDate)).toEqual([today, today]);
+    expect(moved.some((todo) => isOverdue(todo, today))).toBe(false);
+  });
+
+  it("leaves todos that are not overdue as they are", () => {
+    const moved = rescheduleOverdue(dated, today);
+    for (const id of [1, 2, 4, 5]) {
+      expect(moved.find((todo) => todo.id === id)).toBe(dated.find((todo) => todo.id === id));
+    }
+  });
+
+  it("does not change the given list", () => {
+    const copy = structuredClone(dated);
+    rescheduleOverdue(dated, today);
+    expect(dated).toEqual(copy);
   });
 });
