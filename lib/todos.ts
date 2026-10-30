@@ -31,10 +31,16 @@ function parseDueDate(dueDate: string | undefined): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-export function formatDueDate(dueDate: string | undefined): string | null {
+// `today` is the user's calendar day as YYYY-MM-DD, from `localDateString`.
+export function formatDueDate(dueDate: string | undefined, today: string): string | null {
   const date = parseDueDate(dueDate);
+  if (!date) return null;
+  if (dueDate === today) return "Due today";
+  // Both days are UTC midnights, so one day later is exactly 24 hours later.
+  const todayDate = parseDueDate(today);
+  if (todayDate && date.getTime() - todayDate.getTime() === 24 * 60 * 60 * 1000) return "Due tomorrow";
   // Format in UTC to keep the same calendar day the date was parsed as.
-  return date ? `Due ${DUE_DATE_FORMAT.format(date)}` : null;
+  return `Due ${DUE_DATE_FORMAT.format(date)}`;
 }
 
 // Today's calendar day in the user's time zone, as YYYY-MM-DD.

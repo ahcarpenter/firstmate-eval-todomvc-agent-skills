@@ -27,6 +27,8 @@ npm run test:e2e  # end-to-end tests (Playwright); builds and starts the app on 
 - `components/TodoItem.tsx` renders one todo and its edit fields for the title and due date.
 - `lib/todos.ts` has the `Todo` type, filtering, due-date sorting and overdue helpers, and localStorage helpers.
 
+A todo's due date shows as "Due today" or "Due tomorrow" by the browser's calendar, and as "Due Nov 3" otherwise.
+
 A todo is overdue when it is not completed and its due date is before today in the browser's time zone.
 
 The footer's "Sort by date" checkbox shows todos earliest due date first, with undated todos last and ties in their usual order, within every filter.

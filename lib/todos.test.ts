@@ -56,19 +56,32 @@ describe("filterTodos", () => {
 
 describe("formatDueDate", () => {
   it("shows the month and day", () => {
-    expect(formatDueDate("2026-11-03")).toBe("Due Nov 3");
+    expect(formatDueDate("2026-11-03", today)).toBe("Due Nov 3");
+    expect(formatDueDate("2026-10-29", today)).toBe("Due Oct 29");
   });
 
   it("keeps the calendar day regardless of time zone", () => {
-    expect(formatDueDate("2026-01-01")).toBe("Due Jan 1");
-    expect(formatDueDate("2026-12-31")).toBe("Due Dec 31");
+    expect(formatDueDate("2026-01-01", today)).toBe("Due Jan 1");
+    expect(formatDueDate("2026-12-31", today)).toBe("Due Dec 31");
+  });
+
+  it("says today or tomorrow for a todo due soon", () => {
+    expect(formatDueDate("2026-10-30", today)).toBe("Due today");
+    expect(formatDueDate("2026-10-31", today)).toBe("Due tomorrow");
+  });
+
+  it("finds tomorrow across month and year ends", () => {
+    expect(formatDueDate("2026-11-01", "2026-10-31")).toBe("Due tomorrow");
+    expect(formatDueDate("2027-01-01", "2026-12-31")).toBe("Due tomorrow");
+    expect(formatDueDate("2028-02-29", "2028-02-28")).toBe("Due tomorrow");
+    expect(formatDueDate("2028-03-01", "2028-02-28")).toBe("Due Mar 1");
   });
 
   it("returns null without a valid date", () => {
-    expect(formatDueDate(undefined)).toBeNull();
-    expect(formatDueDate("")).toBeNull();
-    expect(formatDueDate("not a date")).toBeNull();
-    expect(formatDueDate("2026-13-01")).toBeNull();
+    expect(formatDueDate(undefined, today)).toBeNull();
+    expect(formatDueDate("", today)).toBeNull();
+    expect(formatDueDate("not a date", today)).toBeNull();
+    expect(formatDueDate("2026-13-01", today)).toBeNull();
   });
 });
 

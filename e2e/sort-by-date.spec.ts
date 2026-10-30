@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("sorts todos by due date within every filter and remembers the choice", async ({ page }) => {
+  await page.clock.setFixedTime(new Date(2026, 9, 30, 12, 0));
   await page.goto("/");
   const input = page.getByPlaceholder("What needs to be done?");
   const dueDate = page.getByLabel("Due date");

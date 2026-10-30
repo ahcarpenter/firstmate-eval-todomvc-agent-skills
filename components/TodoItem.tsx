@@ -5,6 +5,8 @@ import { formatDueDate, type Todo } from "@/lib/todos";
 
 type Props = {
   todo: Todo;
+  // The user's calendar day as YYYY-MM-DD.
+  today: string;
   overdue: boolean;
   editing: boolean;
   onToggle: () => void;
@@ -14,7 +16,7 @@ type Props = {
   onCancel: () => void;
 };
 
-export default function TodoItem({ todo, overdue, editing, onToggle, onDestroy, onEdit, onSave, onCancel }: Props) {
+export default function TodoItem({ todo, today, overdue, editing, onToggle, onDestroy, onEdit, onSave, onCancel }: Props) {
   const [editText, setEditText] = useState(todo.title);
   const [editDueDate, setEditDueDate] = useState(todo.dueDate ?? "");
 
@@ -39,7 +41,7 @@ export default function TodoItem({ todo, overdue, editing, onToggle, onDestroy, 
     if (!event.currentTarget.contains(event.relatedTarget)) onSave(editText, editDueDate);
   }
 
-  const due = formatDueDate(todo.dueDate);
+  const due = formatDueDate(todo.dueDate, today);
   const classes = [todo.completed ? "completed" : "", editing ? "editing" : ""].filter(Boolean).join(" ");
 
   return (

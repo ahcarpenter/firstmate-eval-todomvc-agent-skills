@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("adds a todo with an optional due date that survives a reload", async ({ page }) => {
+  await page.clock.setFixedTime(new Date(2026, 9, 30, 12, 0));
   await page.goto("/");
   const input = page.getByPlaceholder("What needs to be done?");
   const dueDate = page.getByLabel("Due date");
