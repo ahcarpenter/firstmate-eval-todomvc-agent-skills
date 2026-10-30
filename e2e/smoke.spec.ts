@@ -53,3 +53,51 @@ test("flags overdue todos, counts them, and filters to them", async ({ page }) =
   await expect(page.locator(".todo-list li label")).toHaveText(["Renew passportDue Oct 1Overdue"]);
   await expect(page.locator(".todo-count")).toHaveText("3 items left1 overdue");
 });
+
+test.describe("editing a todo's due date", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.clock.setFixedTime(TODAY);
+    await page.goto("/");
+    await page.getByLabel("Due date").fill("2026-11-03");
+    const input = page.getByPlaceholder("What needs to be done?");
+    await input.fill("Pay rent");
+    await input.press("Enter");
+    await page.locator(".todo-list li label").dblclick();
+  });
+
+  test("shows the due date and saves it with the title on Enter", async ({ page }) => {
+    const changeDate = page.getByLabel("Change date");
+    await expect(changeDate).toHaveValue("2026-11-03");
+    await page.locator(".todo-list li .edit").fill("Pay the rent");
+    await changeDate.fill("2026-10-28");
+    await changeDate.press("Enter");
+    await expect(page.locator(".todo-list li label")).toHaveText(["Pay the rentDue Oct 28Overdue"]);
+    await expect(page.locator(".todo-count")).toHaveText("1 item left1 overdue");
+    await page.reload();
+    await expect(page.locator(".todo-list li label")).toHaveText(["Pay the rentDue Oct 28Overdue"]);
+  });
+
+  test("saves from the title field and clears the date when emptied", async ({ page }) => {
+    await page.getByLabel("Change date").fill("");
+    await page.locator(".todo-list li .edit").press("Enter");
+    await expect(page.locator(".todo-list li label")).toHaveText(["Pay rent"]);
+    await page.reload();
+    await expect(page.locator(".todo-list li .todo-due")).toHaveCount(0);
+  });
+
+  test("saves both fields when focus leaves the todo", async ({ page }) => {
+    await page.getByLabel("Change date").fill("2026-11-10");
+    await page.getByRole("heading", { name: "todos" }).click();
+    await expect(page.locator(".todo-list li label")).toHaveText(["Pay rentDue Nov 10"]);
+  });
+
+  test("cancels both changes on Escape", async ({ page }) => {
+    await page.locator(".todo-list li .edit").fill("Pay the rent");
+    const changeDate = page.getByLabel("Change date");
+    await changeDate.fill("2026-10-28");
+    await changeDate.press("Escape");
+    await expect(page.locator(".todo-list li label")).toHaveText(["Pay rentDue Nov 3"]);
+    await page.locator(".todo-list li label").dblclick();
+    await expect(page.getByLabel("Change date")).toHaveValue("2026-11-03");
+  });
+});

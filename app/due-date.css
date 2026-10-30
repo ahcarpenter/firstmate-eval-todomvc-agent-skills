@@ -8,7 +8,9 @@
   min-width: 0;
 }
 
-.new-todo-due {
+/* `.todo-list li` scopes the edit label above TodoMVC's own todo-label rule. */
+.new-todo-due,
+.todo-list li .edit-due {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -17,10 +19,24 @@
   color: #4d4d4d;
 }
 
-.new-todo-due input {
+.new-todo-due input,
+.todo-list li .edit-due input {
   font: inherit;
   font-size: 14px;
   color: inherit;
+}
+
+.todo-list li.editing .edit-row {
+  display: flex;
+  align-items: center;
+  margin-left: 43px;
+}
+
+.todo-list li.editing .edit-row .edit {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  margin: 0;
 }
 
 .todo-due {
