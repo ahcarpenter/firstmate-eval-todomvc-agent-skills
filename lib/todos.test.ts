@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, nextId, pluralize, withUniqueIds, type Todo } from "./todos";
+import { duplicateTodo, filterTodos, nextId, pluralize, withUniqueIds, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -37,6 +37,24 @@ describe("withUniqueIds", () => {
       [3, "three"],
       [4, "four"],
     ]);
+  });
+});
+
+describe("duplicateTodo", () => {
+  it("inserts a not-completed copy right below the original with a fresh id", () => {
+    expect(duplicateTodo(todos, 2)).toEqual([
+      ...todos,
+      { id: 3, title: "Walk the dog", completed: false },
+    ]);
+    expect(duplicateTodo(todos, 1).map((todo) => [todo.id, todo.title])).toEqual([
+      [1, "Buy milk"],
+      [3, "Buy milk"],
+      [2, "Walk the dog"],
+    ]);
+  });
+
+  it("leaves the list alone for an unknown id", () => {
+    expect(duplicateTodo(todos, 99)).toBe(todos);
   });
 });
 

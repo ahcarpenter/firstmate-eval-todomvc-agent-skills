@@ -10,7 +10,7 @@ test("toggling and deleting after a delete affect only one todo", async ({ page 
   const items = page.locator(".todo-list li");
 
   await items.filter({ hasText: "one" }).hover();
-  await items.filter({ hasText: "one" }).getByRole("button").click();
+  await items.filter({ hasText: "one" }).getByRole("button", { name: "Delete" }).click();
   await input.fill("four");
   await input.press("Enter");
   await expect(items).toHaveText(["two", "three", "four"]);
@@ -19,7 +19,7 @@ test("toggling and deleting after a delete affect only one todo", async ({ page 
   await expect(page.locator(".todo-list li.completed")).toHaveText(["four"]);
 
   await items.filter({ hasText: "four" }).hover();
-  await items.filter({ hasText: "four" }).getByRole("button").click();
+  await items.filter({ hasText: "four" }).getByRole("button", { name: "Delete" }).click();
   await expect(items).toHaveText(["two", "three"]);
 });
 
