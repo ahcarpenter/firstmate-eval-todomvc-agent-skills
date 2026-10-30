@@ -5,7 +5,7 @@ import { useState } from "react";
 import TodoItem from "@/components/TodoItem";
 import { useTodos } from "@/components/useTodos";
 import { countActive } from "@/lib/todoReducer";
-import { filterTodos, pluralize, type Filter } from "@/lib/todos";
+import { filterTodos, pinnedFirst, pluralize, type Filter } from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
 
@@ -26,7 +26,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     setEditingId(null);
   }
 
-  const shown = filterTodos(todos, filter);
+  const shown = pinnedFirst(filterTodos(todos, filter));
   const activeCount = countActive(todos);
   const completedCount = todos.length - activeCount;
 
@@ -61,6 +61,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
                   todo={todo}
                   editing={editingId === todo.id}
                   onToggle={() => dispatch({ type: "toggle", id: todo.id })}
+                  onTogglePin={() => dispatch({ type: "togglePin", id: todo.id })}
                   onDestroy={() => dispatch({ type: "destroy", id: todo.id })}
                   onEdit={() => setEditingId(todo.id)}
                   onSave={(title) => save(todo.id, title)}
