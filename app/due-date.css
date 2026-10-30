@@ -1,0 +1,31 @@
+.new-todo-row {
+  display: flex;
+  align-items: center;
+}
+
+.new-todo-row .new-todo {
+  flex: 1;
+  min-width: 0;
+}
+
+.new-todo-due {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 16px;
+  font-size: 12px;
+  color: #4d4d4d;
+}
+
+.new-todo-due input {
+  font: inherit;
+  font-size: 14px;
+  color: inherit;
+}
+
+.todo-due {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  color: #6b6b6b;
+}
