@@ -12,6 +12,8 @@ export const FILTERS: Filter[] = ["all", "active", "completed", "overdue"];
 
 export const STORAGE_KEY = "todos-nextjs";
 
+export const SORT_BY_DUE_KEY = "todos-nextjs-sort-by-due";
+
 export function nextId(todos: Todo[]): number {
   return todos.length + 1;
 }
@@ -54,6 +56,16 @@ export function filterTodos(todos: Todo[], filter: Filter, today: string = today
   return todos;
 }
 
+// Earliest due date first, undated todos last; ties keep their list order.
+export function sortByDue(todos: Todo[]): Todo[] {
+  return [...todos].sort((a, b) => {
+    if (a.due === b.due) return 0;
+    if (a.due === undefined) return 1;
+    if (b.due === undefined) return -1;
+    return a.due < b.due ? -1 : 1;
+  });
+}
+
 export function loadTodos(): Todo[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -65,4 +77,12 @@ export function loadTodos(): Todo[] {
 
 export function saveTodos(todos: Todo[]): void {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+}
+
+export function loadSortByDue(): boolean {
+  return window.localStorage.getItem(SORT_BY_DUE_KEY) === "true";
+}
+
+export function saveSortByDue(sortByDue: boolean): void {
+  window.localStorage.setItem(SORT_BY_DUE_KEY, String(sortByDue));
 }

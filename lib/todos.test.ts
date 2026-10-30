@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, formatDue, isOverdue, nextId, pluralize, todayISO, withDue, type Todo } from "./todos";
+import { filterTodos, formatDue, isOverdue, nextId, pluralize, sortByDue, todayISO, withDue, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -94,5 +94,24 @@ describe("withDue", () => {
 
   it("removes the due date when empty", () => {
     expect(withDue({ ...todos[0], due: "2026-11-03" }, "")).toEqual(todos[0]);
+  });
+});
+
+describe("sortByDue", () => {
+  const list: Todo[] = [
+    { id: 1, title: "Buy milk", completed: false },
+    { id: 2, title: "File taxes", completed: false, due: "2026-11-10" },
+    { id: 3, title: "Walk the dog", completed: true },
+    { id: 4, title: "Pay rent", completed: false, due: "2026-11-01" },
+    { id: 5, title: "Call mom", completed: false, due: "2026-11-10" },
+  ];
+
+  it("puts the earliest due date first and undated todos last, keeping ties in order", () => {
+    expect(sortByDue(list).map((todo) => todo.id)).toEqual([4, 2, 5, 1, 3]);
+  });
+
+  it("leaves the original list untouched", () => {
+    sortByDue(list);
+    expect(list.map((todo) => todo.id)).toEqual([1, 2, 3, 4, 5]);
   });
 });

@@ -66,3 +66,17 @@
 .footer .overdue-count strong {
   font-weight: 300;
 }
+
+/* Sort by date sits opposite the overdue count, under Clear completed.
+   Positioning lifts it above the absolutely positioned .footer:before layer,
+   which would otherwise swallow its clicks. */
+.footer .sort-by-due {
+  position: relative;
+  float: right;
+  clear: right;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  cursor: pointer;
+}
