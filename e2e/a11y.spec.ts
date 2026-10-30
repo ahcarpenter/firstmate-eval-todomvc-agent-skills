@@ -15,6 +15,7 @@ test("names every todo control", async ({ page }) => {
   await expect(page.getByRole("checkbox", { name: "Toggle Buy milk" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Edit Buy milk" })).toBeAttached();
   await expect(page.getByRole("button", { name: "Delete Buy milk" })).toBeAttached();
+  await expect(page.getByRole("button", { name: "Important Buy milk" })).toBeAttached();
 });
 
 test("toggles a todo from the keyboard", async ({ page }) => {
@@ -63,6 +64,67 @@ test("deletes a todo from the keyboard", async ({ page }) => {
 
   await expect(page.locator(".todo-list li")).toHaveText(["Walk the dog"]);
   await expect(page.getByRole("textbox", { name: "New todo" })).toBeFocused();
+});
+
+test("marks a todo important from the keyboard and announces it", async ({ page }) => {
+  await page.getByRole("button", { name: "Delete Buy milk" }).focus();
+  await page.keyboard.press("Tab");
+  const star = page.getByRole("button", { name: "Important Buy milk" });
+  await expect(star).toBeFocused();
+  await expect(star).toBeVisible();
+  await expect(star).toHaveAttribute("aria-pressed", "false");
+
+  await page.keyboard.press("Enter");
+  await expect(star).toHaveAttribute("aria-pressed", "true");
+  await expect(star).toBeFocused();
+
+  await page.keyboard.press("Space");
+  await expect(star).toHaveAttribute("aria-pressed", "false");
+  await expect(star).toBeFocused();
+});
+
+test("shows the star only on important todos at rest", async ({ page }) => {
+  await addTodo(page, "Walk the dog");
+  await page.getByRole("button", { name: "Important Walk the dog" }).click();
+  await page.getByRole("textbox", { name: "New todo" }).focus();
+  await page.mouse.move(0, 0);
+
+  await expect(page.getByRole("button", { name: "Important Walk the dog" })).toHaveCSS("opacity", "1");
+  await expect(page.getByRole("button", { name: "Important Buy milk" })).toHaveCSS("opacity", "0");
+});
+
+test("keeps important marks across reloads, edits, and completing", async ({ page }) => {
+  const star = page.getByRole("button", { name: "Important Buy milk" });
+  await star.click();
+  await page.getByRole("checkbox", { name: "Toggle Buy milk" }).click();
+  await page.reload();
+  await expect(star).toHaveAttribute("aria-pressed", "true");
+
+  await page.getByRole("button", { name: "Edit Buy milk" }).focus();
+  await page.keyboard.press("Enter");
+  await page.getByRole("textbox", { name: "Edit Buy milk" }).fill("Buy oat milk");
+  await page.keyboard.press("Enter");
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Important Buy oat milk" })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("announces todos saved before important marks existed as not important", async ({ page }) => {
+  await page.evaluate(() =>
+    localStorage.setItem("todos-nextjs", JSON.stringify([{ id: 1, title: "Old todo", completed: false }])),
+  );
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Important Old todo" })).toHaveAttribute("aria-pressed", "false");
+});
+
+test("marks only the chosen todo after an earlier delete", async ({ page }) => {
+  await addTodo(page, "Walk the dog");
+  await page.getByRole("button", { name: "Delete Buy milk" }).focus();
+  await page.keyboard.press("Enter");
+  await addTodo(page, "Call mum");
+
+  await page.getByRole("button", { name: "Important Call mum" }).click();
+  await expect(page.getByRole("button", { name: "Important Call mum" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Important Walk the dog" })).toHaveAttribute("aria-pressed", "false");
 });
 
 test("marks the current filter", async ({ page }) => {

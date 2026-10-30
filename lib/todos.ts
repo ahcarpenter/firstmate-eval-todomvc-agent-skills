@@ -2,6 +2,7 @@ export type Todo = {
   id: number;
   title: string;
   completed: boolean;
+  important: boolean;
 };
 
 export type Filter = "all" | "active" | "completed";
@@ -11,7 +12,8 @@ export const FILTERS: Filter[] = ["all", "active", "completed"];
 export const STORAGE_KEY = "todos-nextjs";
 
 export function nextId(todos: Todo[]): number {
-  return todos.length + 1;
+  // Ids must stay unique after deletes, or an action on one todo also hits its twin.
+  return Math.max(0, ...todos.map((todo) => todo.id)) + 1;
 }
 
 export function pluralize(count: number, word: string): string {
@@ -27,7 +29,9 @@ export function filterTodos(todos: Todo[], filter: Filter): Todo[] {
 export function loadTodos(): Todo[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Todo[]) : [];
+    const todos = raw ? (JSON.parse(raw) as Todo[]) : [];
+    // Todos saved before important marks existed have no such field.
+    return todos.map((todo) => ({ ...todo, important: Boolean(todo.important) }));
   } catch {
     return [];
   }

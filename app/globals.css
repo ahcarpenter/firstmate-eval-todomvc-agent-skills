@@ -1,13 +1,13 @@
 /* Keyboard and screen reader additions on top of todomvc-app-css. */
 
 .todo-list li .view label {
-  padding-right: 100px;
+  padding-right: 140px;
 }
 
 .todo-list li .edit-button {
   position: absolute;
   top: 0;
-  right: 50px;
+  right: 90px;
   bottom: 0;
   width: 40px;
   height: 40px;
@@ -29,6 +29,44 @@
   line-height: 40px;
 }
 
+/* The star sits after delete in the DOM, so the row's Tab order runs left to right. */
+.todo-list li .destroy {
+  right: 50px;
+}
+
+.todo-list li .important {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  bottom: 0;
+  width: 40px;
+  height: 40px;
+  margin: auto 0;
+  font-size: 22px;
+  color: #949494;
+  transition: color 0.2s ease-out;
+}
+
+.todo-list li .important:hover,
+.todo-list li .important:focus {
+  color: #484848;
+}
+
+.todo-list li .important[aria-pressed="true"] {
+  color: #b45309;
+}
+
+.todo-list li .important:after {
+  content: "☆";
+  display: block;
+  height: 100%;
+  line-height: 40px;
+}
+
+.todo-list li .important[aria-pressed="true"]:after {
+  content: "★";
+}
+
 /*
   The base styles hide the item buttons with display: none until hover, which also removes them
   from the accessibility tree. Keep them rendered, and clip them out of sight until the row is
@@ -42,4 +80,9 @@
 .todo-list li:not(:hover):not(:focus-within) .edit-button,
 .todo-list li:not(:hover):not(:focus-within) .destroy {
   clip-path: inset(50%);
+}
+
+/* Important todos always show their star. The others fade it, so a tap can still land on it. */
+.todo-list li:not(:hover):not(:focus-within) .important[aria-pressed="false"] {
+  opacity: 0;
 }
