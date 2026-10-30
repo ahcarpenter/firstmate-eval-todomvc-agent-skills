@@ -2,6 +2,8 @@ export type Todo = {
   id: number;
   title: string;
   completed: boolean;
+  // Calendar day as YYYY-MM-DD, the value a date input produces.
+  dueDate?: string;
 };
 
 export type Filter = "all" | "active" | "completed";
@@ -16,6 +18,15 @@ export function nextId(todos: Todo[]): number {
 
 export function pluralize(count: number, word: string): string {
   return count === 1 ? word : `${word}s`;
+}
+
+const DUE_DATE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+
+export function formatDueDate(dueDate: string | undefined): string | null {
+  if (!dueDate || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) return null;
+  // A bare YYYY-MM-DD parses as UTC midnight, so format in UTC to keep the same day.
+  const date = new Date(dueDate);
+  return Number.isNaN(date.getTime()) ? null : `Due ${DUE_DATE_FORMAT.format(date)}`;
 }
 
 export function filterTodos(todos: Todo[], filter: Filter): Todo[] {
