@@ -24,9 +24,9 @@ export function filterTodos(todos: Todo[], filter: Filter): Todo[] {
   return todos;
 }
 
-export function findActiveDuplicate(todos: Todo[], title: string): Todo | undefined {
+export function findActiveDuplicate(todos: Todo[], title: string, exceptId?: number): Todo | undefined {
   const key = title.trim().toLowerCase();
-  return todos.find((todo) => !todo.completed && todo.title.toLowerCase() === key);
+  return todos.find((todo) => todo.id !== exceptId && !todo.completed && todo.title.toLowerCase() === key);
 }
 
 export function loadTodos(): Todo[] {

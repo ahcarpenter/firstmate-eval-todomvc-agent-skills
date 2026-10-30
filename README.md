@@ -27,6 +27,6 @@ npm run test:e2e  # end-to-end tests (Playwright); builds and starts the app on 
 - `components/TodoItem.tsx` renders one todo and its edit field.
 - `lib/todos.ts` has the `Todo` type, filtering, duplicate detection, and localStorage helpers.
 
-Adding a todo whose title (ignoring case and surrounding spaces) matches one that is not done yet is refused with a notice instead.
+Adding a todo, or renaming one, to a title (ignoring case and surrounding spaces) that matches another todo that is not done yet is refused with a notice instead; a refused rename keeps the old title.
 
 Todos persist in `localStorage` under the `todos-nextjs` key.
