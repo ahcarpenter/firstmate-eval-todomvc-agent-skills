@@ -42,6 +42,12 @@ export function localDateString(now: Date): string {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
+// Tomorrow's calendar day in the user's time zone, as YYYY-MM-DD.
+export function tomorrowDateString(now: Date): string {
+  // The Date constructor rolls day overflow into the next month and year.
+  return localDateString(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
+}
+
 // `today` is YYYY-MM-DD, so comparing the strings compares the days.
 export function isOverdue(todo: Todo, today: string): boolean {
   return !todo.completed && parseDueDate(todo.dueDate) !== null && todo.dueDate! < today;

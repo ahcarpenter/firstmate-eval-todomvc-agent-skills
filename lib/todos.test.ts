@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, formatDueDate, isOverdue, localDateString, nextId, pluralize, type Todo } from "./todos";
+import { filterTodos, formatDueDate, isOverdue, localDateString, nextId, pluralize, tomorrowDateString, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -99,5 +99,13 @@ describe("localDateString", () => {
   it("uses the local calendar day", () => {
     expect(localDateString(new Date(2026, 9, 30, 23, 59))).toBe("2026-10-30");
     expect(localDateString(new Date(2026, 0, 5, 0, 0))).toBe("2026-01-05");
+  });
+});
+
+describe("tomorrowDateString", () => {
+  it("uses the next local calendar day", () => {
+    expect(tomorrowDateString(new Date(2026, 9, 30, 23, 59))).toBe("2026-10-31");
+    expect(tomorrowDateString(new Date(2026, 9, 31, 0, 0))).toBe("2026-11-01");
+    expect(tomorrowDateString(new Date(2026, 11, 31, 12, 0))).toBe("2027-01-01");
   });
 });

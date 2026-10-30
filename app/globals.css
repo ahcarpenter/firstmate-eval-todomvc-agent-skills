@@ -38,6 +38,31 @@
   background: #b83f45;
 }
 
+.todo-list li .snooze {
+  position: absolute;
+  top: 0;
+  right: 50px;
+  bottom: 0;
+  margin: auto 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #b83f45;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #b83f45;
+  cursor: pointer;
+}
+
+.todo-list li .snooze:hover {
+  color: #fff;
+  background: #b83f45;
+}
+
+/* Keep long overdue titles clear of the snooze button. */
+.todo-list li:has(.snooze) label {
+  padding-right: 130px;
+}
+
 /* Let the footer grow to fit the overdue count under the items-left count. */
 .footer {
   display: flow-root;

@@ -28,10 +28,10 @@ test("marks overdue todos, filters them, and counts them in the footer", async (
   await page.getByRole("link", { name: "Overdue" }).click();
   await expect(page).toHaveURL(/\/overdue$/);
   await expect(page.getByRole("link", { name: "Overdue" })).toHaveClass("selected");
-  await expect(items).toHaveText(["Pay rentDue Oct 29Overdue"]);
+  await expect(items).toHaveText(["Pay rentDue Oct 29OverdueSnooze"]);
 
   await page.reload();
-  await expect(items).toHaveText(["Pay rentDue Oct 29Overdue"]);
+  await expect(items).toHaveText(["Pay rentDue Oct 29OverdueSnooze"]);
 
   // Completing the todo removes it from this filter, so click rather than check.
   await items.locator(".toggle").click();
