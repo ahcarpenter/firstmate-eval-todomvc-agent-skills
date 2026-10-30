@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, nextId, pluralize, type Todo } from "./todos";
+import { filterTodos, nextId, pluralize, withUniqueIds, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -13,6 +13,30 @@ describe("nextId", () => {
 
   it("follows the existing todos", () => {
     expect(nextId(todos)).toBe(3);
+  });
+
+  it("does not reuse an id after a todo is deleted", () => {
+    const afterDelete = todos.filter((todo) => todo.id !== 1);
+    expect(nextId(afterDelete)).toBe(3);
+  });
+});
+
+describe("withUniqueIds", () => {
+  it("keeps unique ids unchanged", () => {
+    expect(withUniqueIds(todos)).toEqual(todos);
+  });
+
+  it("gives later duplicates fresh ids", () => {
+    const stored: Todo[] = [
+      { id: 2, title: "two", completed: false },
+      { id: 3, title: "three", completed: false },
+      { id: 3, title: "four", completed: true },
+    ];
+    expect(withUniqueIds(stored).map((todo) => [todo.id, todo.title])).toEqual([
+      [2, "two"],
+      [3, "three"],
+      [4, "four"],
+    ]);
   });
 });
 
