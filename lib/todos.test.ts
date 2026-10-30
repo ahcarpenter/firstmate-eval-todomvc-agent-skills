@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { addList, filterTodos, listPath, nextId, parseLists, pluralize, type Todo, type TodoList } from "./todos";
+import {
+  addList,
+  deleteList,
+  filterTodos,
+  listPath,
+  nextId,
+  parseLists,
+  pluralize,
+  renameList,
+  type Todo,
+  type TodoList,
+} from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -88,5 +99,30 @@ describe("parseLists", () => {
 
   it("ignores unreadable storage", () => {
     expect(parseLists("{", "not json")).toEqual([{ id: "1", name: "Todos", todos: [] }]);
+  });
+});
+
+describe("renameList", () => {
+  it("renames only the matching list", () => {
+    const lists: TodoList[] = [
+      { id: "1", name: "Todos", todos },
+      { id: "2", name: "Work", todos: [] },
+    ];
+    expect(renameList(lists, "2", "Office")).toEqual([lists[0], { id: "2", name: "Office", todos: [] }]);
+  });
+});
+
+describe("deleteList", () => {
+  it("removes the list and its todos", () => {
+    const lists: TodoList[] = [
+      { id: "1", name: "Todos", todos },
+      { id: "2", name: "Work", todos: [] },
+    ];
+    expect(deleteList(lists, "1")).toEqual([lists[1]]);
+  });
+
+  it("keeps the last list", () => {
+    const lists: TodoList[] = [{ id: "1", name: "Todos", todos }];
+    expect(deleteList(lists, "1")).toEqual(lists);
   });
 });

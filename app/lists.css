@@ -33,6 +33,32 @@
   border-color: #ce4646;
 }
 
+.lists li {
+  display: flex;
+  align-items: center;
+}
+
+.lists .list-action {
+  padding: 3px 5px;
+  color: #949494;
+  cursor: pointer;
+}
+
+.lists .list-action:hover {
+  color: #c18585;
+}
+
+.lists .list-action:disabled {
+  color: #e6e6e6;
+  cursor: default;
+}
+
+.lists .rename-list {
+  padding: 3px 7px;
+  border: 1px solid #999;
+  font: inherit;
+}
+
 .lists .new-list {
   width: 100%;
   padding: 8px;

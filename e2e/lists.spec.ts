@@ -70,3 +70,47 @@ test("says when a list does not exist", async ({ page }) => {
   await expect(page.getByText("This list does not exist.")).toBeVisible();
   await expect(lists(page)).toHaveText(["Todos"]);
 });
+
+test("renames a list, and Escape cancels", async ({ page }) => {
+  await page.goto("/");
+  await createList(page, "Work");
+  await page.getByRole("button", { name: "Rename Work" }).click();
+  const field = page.getByLabel("List name", { exact: true });
+  await expect(field).toBeFocused();
+  await expect(field).toHaveValue("Work");
+  await field.fill("Office");
+  await field.press("Escape");
+  await expect(lists(page)).toHaveText(["Todos", "Work"]);
+
+  await page.getByRole("button", { name: "Rename Work" }).click();
+  await field.fill("Office");
+  await field.press("Enter");
+  await expect(lists(page)).toHaveText(["Todos", "Office"]);
+  await expect(page.getByRole("button", { name: "Delete Office" })).toBeVisible();
+
+  await page.reload();
+  await expect(lists(page)).toHaveText(["Todos", "Office"]);
+});
+
+test("deletes a list and its todos after confirming", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: "Delete Todos" })).toBeDisabled();
+  await createList(page, "Work");
+  await expect(page).toHaveURL(/\/lists\/2$/);
+  await addTodo(page, "Write report");
+
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.getByRole("button", { name: "Delete Work" }).click();
+  await expect(lists(page)).toHaveText(["Todos", "Work"]);
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete Work" }).click();
+  await expect(page).toHaveURL(/\/lists\/1$/);
+  await expect(lists(page)).toHaveText(["Todos"]);
+  await expect(page.getByRole("button", { name: "Delete Todos" })).toBeDisabled();
+
+  await page.reload();
+  await expect(lists(page)).toHaveText(["Todos"]);
+  await createList(page, "Work");
+  await expect(page.locator(".todo-list li")).toHaveCount(0);
+});

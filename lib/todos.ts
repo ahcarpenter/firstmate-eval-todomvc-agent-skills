@@ -48,6 +48,16 @@ export function addList(lists: TodoList[], name: string): TodoList[] {
   return [...lists, { id: nextListId(lists), name, todos: [] }];
 }
 
+export function renameList(lists: TodoList[], id: string, name: string): TodoList[] {
+  return lists.map((list) => (list.id === id ? { ...list, name } : list));
+}
+
+// Keeps the last list, so there is always one to show.
+export function deleteList(lists: TodoList[], id: string): TodoList[] {
+  const next = lists.filter((list) => list.id !== id);
+  return next.length > 0 ? next : lists;
+}
+
 function parse<T>(raw: string | null): T | null {
   if (!raw) return null;
   try {
