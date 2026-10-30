@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { editTodo, filterTodos, formatDue, isOverdue, localToday, nextId, pluralize, type Todo } from "./todos";
+import {
+  editTodo,
+  filterTodos,
+  formatDue,
+  isOverdue,
+  localToday,
+  nextId,
+  pluralize,
+  sortByDue,
+  type Todo,
+} from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -47,6 +57,28 @@ describe("filterTodos", () => {
 
   it("returns only overdue todos", () => {
     expect(filterTodos(todos, "overdue", TODAY).map((todo) => todo.id)).toEqual([3]);
+  });
+});
+
+describe("sortByDue", () => {
+  it("puts the earliest due date first and undated todos last, keeping ties in order", () => {
+    expect(sortByDue(todos).map((todo) => todo.id)).toEqual([3, 4, 5, 1, 2]);
+  });
+
+  it("orders dates across months and years", () => {
+    const dated: Todo[] = [
+      { id: 1, title: "a", completed: false, due: "2027-01-02" },
+      { id: 2, title: "b", completed: false },
+      { id: 3, title: "c", completed: false, due: "2026-12-31" },
+      { id: 4, title: "d", completed: false, due: "2026-02-10" },
+    ];
+    expect(sortByDue(dated).map((todo) => todo.id)).toEqual([4, 3, 1, 2]);
+  });
+
+  it("leaves the input untouched", () => {
+    const copy = [...todos];
+    sortByDue(todos);
+    expect(todos).toEqual(copy);
   });
 });
 

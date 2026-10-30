@@ -54,6 +54,46 @@ test("flags overdue todos, counts them, and filters to them", async ({ page }) =
   await expect(page.locator(".todo-count")).toHaveText("3 items left1 overdue");
 });
 
+test("sorts by due date within each filter and keeps the choice across reloads", async ({ page }) => {
+  await page.clock.setFixedTime(TODAY);
+  await page.goto("/");
+  const input = page.getByPlaceholder("What needs to be done?");
+  const due = page.getByLabel("Due date");
+  for (const [title, date] of [
+    ["Buy milk", ""],
+    ["Book flights", "2026-11-10"],
+    ["Pay rent", "2026-11-03"],
+    ["Walk the dog", ""],
+    ["File taxes", "2026-11-03"],
+  ]) {
+    await due.fill(date);
+    await input.fill(title);
+    await input.press("Enter");
+  }
+  const titles = page.locator(".todo-list li label");
+  const usual = ["Buy milk", "Book flightsDue Nov 10", "Pay rentDue Nov 3", "Walk the dog", "File taxesDue Nov 3"];
+  const byDate = ["Pay rentDue Nov 3", "File taxesDue Nov 3", "Book flightsDue Nov 10", "Buy milk", "Walk the dog"];
+  const sortByDate = page.getByLabel("Sort by date");
+  await expect(sortByDate).not.toBeChecked();
+  await expect(titles).toHaveText(usual);
+
+  await sortByDate.check();
+  await expect(titles).toHaveText(byDate);
+  await page.reload();
+  await expect(sortByDate).toBeChecked();
+  await expect(titles).toHaveText(byDate);
+
+  await page.locator(".todo-list li", { hasText: "Pay rent" }).locator(".toggle").click();
+  await page.getByRole("link", { name: "Active" }).click();
+  await expect(page).toHaveURL("/active");
+  await expect(titles).toHaveText(["File taxesDue Nov 3", "Book flightsDue Nov 10", "Buy milk", "Walk the dog"]);
+
+  await sortByDate.uncheck();
+  await expect(titles).toHaveText(["Buy milk", "Book flightsDue Nov 10", "Walk the dog", "File taxesDue Nov 3"]);
+  await page.reload();
+  await expect(sortByDate).not.toBeChecked();
+});
+
 test.describe("editing a todo's due date", () => {
   test.beforeEach(async ({ page }) => {
     await page.clock.setFixedTime(TODAY);

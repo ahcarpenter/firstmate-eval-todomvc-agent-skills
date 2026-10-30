@@ -7,11 +7,14 @@ import {
   editTodo,
   filterTodos,
   isOverdue,
+  loadSortByDue,
   loadTodos,
   localToday,
   nextId,
   pluralize,
+  saveSortByDue,
   saveTodos,
+  sortByDue,
   type Filter,
   type Todo,
 } from "@/lib/todos";
@@ -24,11 +27,13 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   const [newTitle, setNewTitle] = useState("");
   const [newDue, setNewDue] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [sortedByDue, setSortedByDue] = useState(false);
 
   useEffect(() => {
     // Read storage after mount so the server render and the first client render match.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTodos(loadTodos());
+    setSortedByDue(loadSortByDue());
     setLoaded(true);
   }, []);
 
@@ -69,13 +74,19 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     setEditingId(null);
   }
 
+  function changeSortByDue(sorted: boolean) {
+    setSortedByDue(sorted);
+    saveSortByDue(sorted);
+  }
+
   function clearCompleted() {
     setTodos(todos.filter((todo) => !todo.completed));
   }
 
   // Todos load after mount, so the server render never sees a date-dependent list.
   const today = localToday();
-  const shown = filterTodos(todos, filter, today);
+  const filtered = filterTodos(todos, filter, today);
+  const shown = sortedByDue ? sortByDue(filtered) : filtered;
   const activeCount = todos.filter((todo) => !todo.completed).length;
   const overdueCount = todos.filter((todo) => isOverdue(todo, today)).length;
   const completedCount = todos.length - activeCount;
@@ -165,6 +176,14 @@ export default function TodoApp({ filter }: { filter: Filter }) {
                 Clear completed
               </button>
             )}
+            <label className="sort-by-due">
+              <input
+                type="checkbox"
+                checked={sortedByDue}
+                onChange={(event) => changeSortByDue(event.target.checked)}
+              />
+              Sort by date
+            </label>
           </footer>
         )}
       </section>

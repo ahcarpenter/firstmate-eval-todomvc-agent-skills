@@ -68,3 +68,15 @@
   margin-top: 4px;
   color: #b83f45;
 }
+
+/* Its own line under the count and filters, like the overdue count. Positioned, as
+   TodoMVC's clear-completed button is, so the footer's stacked-paper shadow stays below it. */
+.sort-by-due {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  clear: both;
+  padding-top: 8px;
+}
