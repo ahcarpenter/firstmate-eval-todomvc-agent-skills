@@ -3,7 +3,19 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import TodoItem from "@/components/TodoItem";
-import { filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
+import {
+  filterTodos,
+  loadTodos,
+  nextId,
+  pluralize,
+  removeTodo,
+  restoreTodo,
+  saveTodos,
+  UNDO_DELETE_MS,
+  type DeletedTodo,
+  type Filter,
+  type Todo,
+} from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
 
@@ -12,6 +24,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   const [loaded, setLoaded] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [lastDeleted, setLastDeleted] = useState<DeletedTodo | null>(null);
 
   useEffect(() => {
     // Read storage after mount so the server render and the first client render match.
@@ -23,6 +36,12 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   useEffect(() => {
     if (loaded) saveTodos(todos);
   }, [todos, loaded]);
+
+  useEffect(() => {
+    if (!lastDeleted) return;
+    const timer = setTimeout(() => setLastDeleted(null), UNDO_DELETE_MS);
+    return () => clearTimeout(timer);
+  }, [lastDeleted]);
 
   function addTodo(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key !== ENTER_KEY) return;
@@ -41,7 +60,15 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   }
 
   function destroy(id: number) {
-    setTodos(todos.filter((todo) => todo.id !== id));
+    const { todos: remaining, deleted } = removeTodo(todos, id);
+    setTodos(remaining);
+    setLastDeleted(deleted);
+  }
+
+  function undoDelete() {
+    if (!lastDeleted) return;
+    setTodos(restoreTodo(todos, lastDeleted));
+    setLastDeleted(null);
   }
 
   function save(id: number, title: string) {
@@ -132,6 +159,12 @@ export default function TodoApp({ filter }: { filter: Filter }) {
           </footer>
         )}
       </section>
+      {lastDeleted && (
+        <div className="undo-delete" role="status">
+          <span>Deleted &ldquo;{lastDeleted.todo.title}&rdquo;</span>
+          <button onClick={undoDelete}>Undo</button>
+        </div>
+      )}
       <footer className="info">
         <p>Double-click to edit a todo</p>
         <p>

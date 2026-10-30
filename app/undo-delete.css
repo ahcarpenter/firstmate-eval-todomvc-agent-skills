@@ -1,0 +1,29 @@
+.undo-delete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 24px 0 0;
+  padding: 12px 16px;
+  background: #4d4d4d;
+  color: #fff;
+  font-size: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.undo-delete span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.undo-delete button {
+  color: #f4c96b;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.undo-delete button:focus-visible {
+  outline: 2px solid #f4c96b;
+}

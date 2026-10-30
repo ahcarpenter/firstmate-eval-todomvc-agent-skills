@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, nextId, pluralize, type Todo } from "./todos";
+import { filterTodos, nextId, pluralize, removeTodo, restoreTodo, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -38,5 +38,26 @@ describe("filterTodos", () => {
 
   it("returns only completed todos", () => {
     expect(filterTodos(todos, "completed").map((todo) => todo.id)).toEqual([2]);
+  });
+});
+
+describe("removeTodo", () => {
+  it("removes the todo and remembers where it was", () => {
+    expect(removeTodo(todos, 2)).toEqual({ todos: [todos[0]], deleted: { todo: todos[1], index: 1 } });
+  });
+
+  it("leaves the list alone for an unknown id", () => {
+    expect(removeTodo(todos, 99)).toEqual({ todos, deleted: null });
+  });
+});
+
+describe("restoreTodo", () => {
+  it("puts the todo back where it was", () => {
+    const { todos: remaining, deleted } = removeTodo(todos, 1);
+    expect(restoreTodo(remaining, deleted!)).toEqual(todos);
+  });
+
+  it("appends when the list has since shrunk", () => {
+    expect(restoreTodo([], { todo: todos[1], index: 1 })).toEqual([todos[1]]);
   });
 });

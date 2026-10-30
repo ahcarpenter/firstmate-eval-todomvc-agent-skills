@@ -36,3 +36,21 @@ export function loadTodos(): Todo[] {
 export function saveTodos(todos: Todo[]): void {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
 }
+
+export const UNDO_DELETE_MS = 5000;
+
+export type DeletedTodo = {
+  todo: Todo;
+  index: number;
+};
+
+export function removeTodo(todos: Todo[], id: number): { todos: Todo[]; deleted: DeletedTodo | null } {
+  const index = todos.findIndex((todo) => todo.id === id);
+  if (index === -1) return { todos, deleted: null };
+  return { todos: todos.filter((todo) => todo.id !== id), deleted: { todo: todos[index], index } };
+}
+
+export function restoreTodo(todos: Todo[], { todo, index }: DeletedTodo): Todo[] {
+  const at = Math.min(index, todos.length);
+  return [...todos.slice(0, at), todo, ...todos.slice(at)];
+}
