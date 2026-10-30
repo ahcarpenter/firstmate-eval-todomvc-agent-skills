@@ -24,10 +24,17 @@ export function pluralize(count: number, word: string): string {
 
 const DUE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
 
-export function formatDue(due: string): string {
-  // Build the date from its parts so it stays on the same day in every time zone.
-  const [year, month, day] = due.split("-").map(Number);
-  return `Due ${DUE_FORMAT.format(new Date(year, month - 1, day))}`;
+// Build a local date from YYYY-MM-DD parts so it stays on the same day in every time zone.
+function parseISO(date: string, addDays = 0): Date {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(year, month - 1, day + addDays);
+}
+
+// Today and tomorrow read as words; every other date as "Due Nov 3".
+export function formatDue(due: string, today: string): string {
+  if (due === today) return "Due today";
+  if (due === todayISO(parseISO(today, 1))) return "Due tomorrow";
+  return `Due ${DUE_FORMAT.format(parseISO(due))}`;
 }
 
 // Today's local calendar date as YYYY-MM-DD, comparable with a todo's due date.

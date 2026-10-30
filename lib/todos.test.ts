@@ -78,12 +78,31 @@ describe("todayISO", () => {
 });
 
 describe("formatDue", () => {
+  const today = "2026-11-01";
+
   it("shows the short month and day", () => {
-    expect(formatDue("2026-11-03")).toBe("Due Nov 3");
+    expect(formatDue("2026-11-03", today)).toBe("Due Nov 3");
   });
 
   it("keeps the stored calendar day", () => {
-    expect(formatDue("2027-01-31")).toBe("Due Jan 31");
+    expect(formatDue("2027-01-31", today)).toBe("Due Jan 31");
+  });
+
+  it("says today for a todo due today", () => {
+    expect(formatDue("2026-11-01", today)).toBe("Due today");
+  });
+
+  it("says tomorrow for a todo due the next day", () => {
+    expect(formatDue("2026-11-02", today)).toBe("Due tomorrow");
+  });
+
+  it("keeps the date for a todo due yesterday", () => {
+    expect(formatDue("2026-10-31", today)).toBe("Due Oct 31");
+  });
+
+  it("finds tomorrow across a month and a year end", () => {
+    expect(formatDue("2026-12-01", "2026-11-30")).toBe("Due tomorrow");
+    expect(formatDue("2027-01-01", "2026-12-31")).toBe("Due tomorrow");
   });
 });
 
