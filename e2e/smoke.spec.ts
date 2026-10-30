@@ -163,3 +163,30 @@ test.describe("due-soon labels", () => {
     await expect(page.locator(".todo-list li .todo-due")).toHaveText(["Due today", "Due tomorrow", "Due Oct 31"]);
   });
 });
+
+test("searches titles within the current filter without changing the count", async ({ page }) => {
+  await page.goto("/");
+  const input = page.getByPlaceholder("What needs to be done?");
+  for (const title of ["Buy milk", "Walk the dog", "Buy DOG food", "Pay rent"]) {
+    await input.fill(title);
+    await input.press("Enter");
+  }
+  await page.locator(".todo-list li", { hasText: "Buy milk" }).locator(".toggle").click();
+  const titles = page.locator(".todo-list li label");
+  const search = page.getByLabel("Search");
+
+  await search.fill("dOg");
+  await expect(titles).toHaveText(["Walk the dog", "Buy DOG food"]);
+  await expect(page.locator(".todo-count")).toHaveText("3 items left");
+
+  await search.fill("buy");
+  await expect(titles).toHaveText(["Buy milk", "Buy DOG food"]);
+  await page.getByRole("link", { name: "Active" }).click();
+  await expect(page).toHaveURL("/active");
+  await search.fill("buy");
+  await expect(titles).toHaveText(["Buy DOG food"]);
+  await expect(page.locator(".todo-count")).toHaveText("3 items left");
+
+  await search.fill("");
+  await expect(titles).toHaveText(["Walk the dog", "Buy DOG food", "Pay rent"]);
+});

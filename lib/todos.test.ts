@@ -7,6 +7,7 @@ import {
   localToday,
   nextId,
   pluralize,
+  searchTodos,
   sortByDue,
   type Todo,
 } from "./todos";
@@ -57,6 +58,23 @@ describe("filterTodos", () => {
 
   it("returns only overdue todos", () => {
     expect(filterTodos(todos, "overdue", TODAY).map((todo) => todo.id)).toEqual([3]);
+  });
+});
+
+describe("searchTodos", () => {
+  it("keeps todos whose title contains the text, ignoring letter case", () => {
+    expect(searchTodos(todos, "PA").map((todo) => todo.id)).toEqual([3]);
+    expect(searchTodos(todos, "b").map((todo) => todo.id)).toEqual([1, 5]);
+  });
+
+  it("returns everything for an empty or blank search", () => {
+    expect(searchTodos(todos, "")).toBe(todos);
+    expect(searchTodos(todos, "   ")).toBe(todos);
+  });
+
+  it("ignores surrounding spaces but matches inner ones", () => {
+    expect(searchTodos(todos, " the dog ").map((todo) => todo.id)).toEqual([2]);
+    expect(searchTodos(todos, "milk dog")).toEqual([]);
   });
 });
 

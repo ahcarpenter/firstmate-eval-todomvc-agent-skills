@@ -80,3 +80,23 @@
   clear: both;
   padding-top: 8px;
 }
+
+/* Positioned, like the list, so the main section's stacked layers stay below it. */
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #ededed;
+  font-size: 14px;
+  color: #4d4d4d;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  font: inherit;
+  color: inherit;
+}
