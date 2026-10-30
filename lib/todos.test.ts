@@ -57,4 +57,8 @@ describe("findActiveDuplicate", () => {
   it("returns nothing for a new title", () => {
     expect(findActiveDuplicate(todos, "Buy bread")).toBeUndefined();
   });
+
+  it("skips the excepted todo", () => {
+    expect(findActiveDuplicate(todos, "buy milk", 1)).toBeUndefined();
+  });
 });

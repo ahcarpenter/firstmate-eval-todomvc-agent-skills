@@ -7,6 +7,10 @@ import { filterTodos, findActiveDuplicate, loadTodos, nextId, pluralize, saveTod
 
 const ENTER_KEY = "Enter";
 
+function duplicateNotice(duplicate: Todo): string {
+  return `“${duplicate.title}” is already on your list.`;
+}
+
 const noticeStyle: React.CSSProperties = {
   margin: 0,
   padding: "8px 16px 8px 60px",
@@ -39,7 +43,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     if (!title) return;
     const duplicate = findActiveDuplicate(todos, title);
     if (duplicate) {
-      setNotice(`“${duplicate.title}” is already on your list.`);
+      setNotice(duplicateNotice(duplicate));
       return;
     }
     setTodos([...todos, { id: nextId(todos), title, completed: false }]);
@@ -60,8 +64,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
 
   function save(id: number, title: string) {
     const trimmed = title.trim();
+    const duplicate = findActiveDuplicate(todos, trimmed, id);
     if (!trimmed) {
       destroy(id);
+    } else if (duplicate) {
+      setNotice(duplicateNotice(duplicate));
     } else {
       setTodos(todos.map((todo) => (todo.id === id ? { ...todo, title: trimmed } : todo)));
     }
@@ -115,7 +122,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
                   editing={editingId === todo.id}
                   onToggle={() => toggle(todo.id)}
                   onDestroy={() => destroy(todo.id)}
-                  onEdit={() => setEditingId(todo.id)}
+                  onEdit={() => {
+                    setEditingId(todo.id);
+                    setNotice("");
+                  }}
                   onSave={(title) => save(todo.id, title)}
                   onCancel={() => setEditingId(null)}
                 />
