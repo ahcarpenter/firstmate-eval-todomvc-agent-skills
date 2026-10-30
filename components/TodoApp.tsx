@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import TodoItem from "@/components/TodoItem";
-import { filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
+import { filterTodos, loadTodos, nextId, percentComplete, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
 
@@ -61,6 +61,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   const shown = filterTodos(todos, filter);
   const activeCount = todos.filter((todo) => !todo.completed).length;
   const completedCount = todos.length - activeCount;
+  const percent = percentComplete(todos);
 
   return (
     <>
@@ -86,6 +87,22 @@ export default function TodoApp({ filter }: { filter: Filter }) {
               onChange={(event) => toggleAll(event.target.checked)}
             />
             <label htmlFor="toggle-all">Mark all as complete</label>
+            <div className="progress" style={{ padding: "8px 16px", borderBottom: "1px solid #ededed" }}>
+              <div
+                className="progress-bar"
+                role="progressbar"
+                aria-label="Todos completed"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={percent}
+                style={{ height: 6, background: "#ededed", borderRadius: 3, overflow: "hidden" }}
+              >
+                <div style={{ width: `${percent}%`, height: "100%", background: "#5dc2af", transition: "width 0.2s" }} />
+              </div>
+              <p className="progress-label" style={{ marginTop: 4, fontSize: 14, color: "#777" }}>
+                {percent}% complete
+              </p>
+            </div>
             <ul className="todo-list">
               {shown.map((todo) => (
                 <TodoItem
