@@ -39,6 +39,36 @@
   font-size: 12px;
 }
 
+/* Snooze sits left of the destroy button, so overdue rows keep their text clear of both. */
+.todo-list li.overdue label {
+  padding-right: 120px;
+}
+
+.todo-list li .snooze {
+  position: absolute;
+  top: 0;
+  right: 50px;
+  bottom: 0;
+  height: 28px;
+  margin: auto 0;
+  padding: 0 8px;
+  border: 1px solid #b83f45;
+  border-radius: 3px;
+  color: #b83f45;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.todo-list li .snooze:hover,
+.todo-list li .snooze:focus {
+  background: #b83f45;
+  color: #fff;
+}
+
+.todo-list li.editing .snooze {
+  display: none;
+}
+
 /* The centered filters leave no room beside the item count, so the overdue count
    takes its own line and the footer grows around the floated count. */
 .footer {

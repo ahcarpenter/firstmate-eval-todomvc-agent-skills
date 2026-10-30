@@ -53,3 +53,28 @@ test("flags overdue todos, counts them, and filters to them", async ({ page }) =
   await expect(page.locator(".todo-list li label")).toHaveText(["Renew passportDue Oct 1Overdue"]);
   await expect(page.locator(".todo-count")).toHaveText("3 items left1 overdue");
 });
+
+test("snoozes an overdue todo to tomorrow", async ({ page }) => {
+  await page.clock.setFixedTime(TODAY);
+  await page.goto("/");
+  const input = page.getByPlaceholder("What needs to be done?");
+  const due = page.getByLabel("Due date");
+  for (const [title, date] of [
+    ["Pay rent", "2026-10-28"],
+    ["Book flights", "2026-11-03"],
+  ]) {
+    await due.fill(date);
+    await input.fill(title);
+    await input.press("Enter");
+  }
+  await expect(page.getByRole("button", { name: "Snooze" })).toHaveCount(1);
+
+  await page.locator(".todo-list li").first().hover();
+  await page.getByRole("button", { name: "Snooze" }).click();
+  await expect(page.locator(".todo-list li label")).toHaveText(["Pay rentDue Oct 30", "Book flightsDue Nov 3"]);
+  await expect(page.getByRole("button", { name: "Snooze" })).toHaveCount(0);
+  await expect(page.locator(".todo-count")).toHaveText("2 items left");
+
+  await page.reload();
+  await expect(page.locator(".todo-list li .todo-due")).toHaveText(["Due Oct 30", "Due Nov 3"]);
+});

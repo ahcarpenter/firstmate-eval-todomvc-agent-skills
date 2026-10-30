@@ -34,6 +34,11 @@ export function localToday(now: Date = new Date()): string {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
+/** The viewer's local calendar date after `now`, as `YYYY-MM-DD`. */
+export function localTomorrow(now: Date = new Date()): string {
+  return localToday(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
+}
+
 // `YYYY-MM-DD` strings sort the same way as the dates they name.
 export function isOverdue(todo: Todo, today: string): boolean {
   return !todo.completed && todo.due !== undefined && todo.due < today;
