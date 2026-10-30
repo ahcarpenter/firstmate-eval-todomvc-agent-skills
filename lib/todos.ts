@@ -8,7 +8,18 @@ export type Filter = "all" | "active" | "completed";
 
 export const FILTERS: Filter[] = ["all", "active", "completed"];
 
-export const STORAGE_KEY = "todos-nextjs";
+export type TodoList = {
+  id: string;
+  name: string;
+  todos: Todo[];
+};
+
+export const STORAGE_KEY = "todos-nextjs-lists";
+
+// Todos saved before lists existed; read once to seed the "Todos" list and left in place.
+export const LEGACY_STORAGE_KEY = "todos-nextjs";
+
+export const DEFAULT_LIST_NAME = "Todos";
 
 export function nextId(todos: Todo[]): number {
   return todos.length + 1;
@@ -24,15 +35,35 @@ export function filterTodos(todos: Todo[], filter: Filter): Todo[] {
   return todos;
 }
 
-export function loadTodos(): Todo[] {
+export function nextListId(lists: TodoList[]): string {
+  return String(lists.reduce((max, list) => Math.max(max, Number(list.id) || 0), 0) + 1);
+}
+
+export function addList(lists: TodoList[], name: string): TodoList[] {
+  return [...lists, { id: nextListId(lists), name, todos: [] }];
+}
+
+export function listPath(id: string, filter: Filter = "all"): string {
+  const base = `/lists/${encodeURIComponent(id)}`;
+  return filter === "all" ? base : `${base}/${filter}`;
+}
+
+function readJson<T>(storage: Pick<Storage, "getItem">, key: string): T | null {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Todo[]) : [];
+    const raw = storage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
   } catch {
-    return [];
+    return null;
   }
 }
 
-export function saveTodos(todos: Todo[]): void {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+export function loadLists(storage: Pick<Storage, "getItem"> = window.localStorage): TodoList[] {
+  const lists = readJson<TodoList[]>(storage, STORAGE_KEY);
+  if (lists && lists.length > 0) return lists;
+  const legacyTodos = readJson<Todo[]>(storage, LEGACY_STORAGE_KEY) ?? [];
+  return [{ id: "1", name: DEFAULT_LIST_NAME, todos: legacyTodos }];
+}
+
+export function saveLists(lists: TodoList[]): void {
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(lists));
 }
