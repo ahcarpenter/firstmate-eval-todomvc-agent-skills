@@ -133,6 +133,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
         )}
       </section>
       <footer className="info">
+        {todos.length > 0 && (
+          <p className="completed-count">
+            <strong>{completedCount}</strong> of {todos.length} completed
+          </p>
+        )}
         <p>Double-click to edit a todo</p>
         <p>
           Part of <a href="https://todomvc.com">TodoMVC</a>
