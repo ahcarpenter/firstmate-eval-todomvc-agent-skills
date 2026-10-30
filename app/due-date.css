@@ -19,7 +19,18 @@
   white-space: nowrap;
 }
 
-.new-todo-due input {
+.todo-list li .edit-due {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 43px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #757575;
+}
+
+.new-todo-due input,
+.todo-list li .edit-due input {
   font: inherit;
   color: #484848;
   border: 1px solid #e6e6e6;

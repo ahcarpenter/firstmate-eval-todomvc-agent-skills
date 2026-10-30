@@ -35,6 +35,13 @@ export function todayISO(now: Date = new Date()): string {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
+// An empty date, what a cleared <input type="date"> holds, removes the due date.
+export function withDue(todo: Todo, due: string): Todo {
+  const updated: Todo = { ...todo, due };
+  if (!due) delete updated.due;
+  return updated;
+}
+
 export function isOverdue(todo: Todo, today: string): boolean {
   // YYYY-MM-DD strings sort in calendar order.
   return !todo.completed && todo.due !== undefined && todo.due < today;

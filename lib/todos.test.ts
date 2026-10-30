@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, formatDue, isOverdue, nextId, pluralize, todayISO, type Todo } from "./todos";
+import { filterTodos, formatDue, isOverdue, nextId, pluralize, todayISO, withDue, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -84,5 +84,15 @@ describe("formatDue", () => {
 
   it("keeps the stored calendar day", () => {
     expect(formatDue("2027-01-31")).toBe("Due Jan 31");
+  });
+});
+
+describe("withDue", () => {
+  it("sets the due date", () => {
+    expect(withDue(todos[0], "2026-11-03")).toEqual({ id: 1, title: "Buy milk", completed: false, due: "2026-11-03" });
+  });
+
+  it("removes the due date when empty", () => {
+    expect(withDue({ ...todos[0], due: "2026-11-03" }, "")).toEqual(todos[0]);
   });
 });
