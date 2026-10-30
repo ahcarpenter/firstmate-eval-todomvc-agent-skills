@@ -5,6 +5,7 @@ import {
   formatDue,
   isOverdue,
   localToday,
+  moveOverdueToToday,
   nextId,
   pluralize,
   searchTodos,
@@ -159,6 +160,24 @@ describe("isOverdue", () => {
 
   it("is false for a todo without a due date", () => {
     expect(isOverdue({ id: 1, title: "a", completed: false }, TODAY)).toBe(false);
+  });
+});
+
+describe("moveOverdueToToday", () => {
+  it("moves only overdue todos to today and keeps the rest as they were", () => {
+    expect(moveOverdueToToday(todos, TODAY)).toEqual([
+      todos[0],
+      todos[1],
+      { ...todos[2], due: TODAY },
+      todos[3],
+      todos[4],
+    ]);
+  });
+
+  it("leaves the input untouched", () => {
+    const copy = structuredClone(todos);
+    moveOverdueToToday(todos, TODAY);
+    expect(todos).toEqual(copy);
   });
 });
 

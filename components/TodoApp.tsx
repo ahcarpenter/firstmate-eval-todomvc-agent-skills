@@ -10,6 +10,7 @@ import {
   loadSortByDue,
   loadTodos,
   localToday,
+  moveOverdueToToday,
   nextId,
   pluralize,
   saveSortByDue,
@@ -79,6 +80,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   function changeSortByDue(sorted: boolean) {
     setSortedByDue(sorted);
     saveSortByDue(sorted);
+  }
+
+  function moveOverdue() {
+    setTodos(moveOverdueToToday(todos, localToday()));
   }
 
   function clearCompleted() {
@@ -191,6 +196,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
               />
               Sort by date
             </label>
+            {overdueCount > 0 && (
+              <button className="move-overdue" onClick={moveOverdue}>
+                Move overdue to today
+              </button>
+            )}
           </footer>
         )}
       </section>

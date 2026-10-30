@@ -25,6 +25,6 @@ npm run test:e2e  # end-to-end tests (Playwright); builds and starts the app on 
 - `app/[[...filter]]/page.tsx` serves `/`, `/active`, `/completed`, and `/overdue`.
 - `components/TodoApp.tsx` holds the list state, persistence, and the page UI, including the Search field that narrows the current filter by title.
 - `components/TodoItem.tsx` renders one todo and its title and due-date edit fields.
-- `lib/todos.ts` has the `Todo` type, filtering, title search, due-date sorting, overdue checks, and localStorage helpers.
+- `lib/todos.ts` has the `Todo` type, filtering, title search, due-date sorting, overdue checks and rescheduling, and localStorage helpers.
 
 Todos persist in `localStorage` under the `todos-nextjs` key, and the footer's "Sort by date" choice under `todos-nextjs-sort-by-due`.

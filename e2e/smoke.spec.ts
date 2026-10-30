@@ -190,3 +190,29 @@ test("searches titles within the current filter without changing the count", asy
   await search.fill("");
   await expect(titles).toHaveText(["Walk the dog", "Buy DOG food", "Pay rent"]);
 });
+
+test("moves every overdue todo to today from the footer", async ({ page }) => {
+  await page.clock.setFixedTime(TODAY);
+  await page.goto("/");
+  const input = page.getByPlaceholder("What needs to be done?");
+  const due = page.getByLabel("Due date");
+  for (const [title, date] of [
+    ["Pay rent", "2026-10-28"],
+    ["Book flights", "2026-11-03"],
+    ["Renew passport", "2026-10-01"],
+  ]) {
+    await due.fill(date);
+    await input.fill(title);
+    await input.press("Enter");
+  }
+  const move = page.getByRole("button", { name: "Move overdue to today" });
+  await expect(move).toBeVisible();
+
+  await move.click();
+  await expect(page.locator(".todo-list li .todo-due")).toHaveText(["Due today", "Due Nov 3", "Due today"]);
+  await expect(page.locator(".todo-list li .todo-overdue")).toHaveCount(0);
+  await expect(page.locator(".todo-count")).toHaveText("3 items left");
+  await expect(move).toBeHidden();
+  await page.reload();
+  await expect(page.locator(".todo-list li .todo-due")).toHaveText(["Due today", "Due Nov 3", "Due today"]);
+});

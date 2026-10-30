@@ -81,6 +81,19 @@
   padding-top: 8px;
 }
 
+/* Its own line under the sort checkbox, positioned for the same reason. */
+.move-overdue {
+  position: relative;
+  display: block;
+  margin: 8px auto 0;
+  color: #b83f45;
+  cursor: pointer;
+}
+
+.move-overdue:hover {
+  text-decoration: underline;
+}
+
 /* Positioned, like the list, so the main section's stacked layers stay below it. */
 .search {
   position: relative;
