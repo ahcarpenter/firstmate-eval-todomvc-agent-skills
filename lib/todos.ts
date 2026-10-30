@@ -2,6 +2,8 @@ export type Todo = {
   id: number;
   title: string;
   completed: boolean;
+  // Calendar date as YYYY-MM-DD, the value an <input type="date"> produces.
+  due?: string;
 };
 
 export type Filter = "all" | "active" | "completed";
@@ -16,6 +18,14 @@ export function nextId(todos: Todo[]): number {
 
 export function pluralize(count: number, word: string): string {
   return count === 1 ? word : `${word}s`;
+}
+
+const DUE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
+
+export function formatDue(due: string): string {
+  // Build the date from its parts so it stays on the same day in every time zone.
+  const [year, month, day] = due.split("-").map(Number);
+  return `Due ${DUE_FORMAT.format(new Date(year, month - 1, day))}`;
 }
 
 export function filterTodos(todos: Todo[], filter: Filter): Todo[] {

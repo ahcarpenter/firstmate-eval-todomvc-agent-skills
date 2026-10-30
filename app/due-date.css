@@ -1,0 +1,34 @@
+/* Due date additions layered on todomvc-app-css. */
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.new-todo {
+  flex: 1;
+  min-width: 0;
+}
+
+.new-todo-due {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 0 8px;
+  color: #757575;
+  white-space: nowrap;
+}
+
+.new-todo-due input {
+  font: inherit;
+  color: #484848;
+  border: 1px solid #e6e6e6;
+  padding: 4px;
+}
+
+.todo-list li .todo-due {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  color: #757575;
+}

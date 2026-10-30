@@ -11,6 +11,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [newDue, setNewDue] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -28,8 +29,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     if (event.key !== ENTER_KEY) return;
     const title = newTitle.trim();
     if (!title) return;
-    setTodos([...todos, { id: nextId(todos), title, completed: false }]);
+    const todo: Todo = { id: nextId(todos), title, completed: false };
+    if (newDue) todo.due = newDue;
+    setTodos([...todos, todo]);
     setNewTitle("");
+    setNewDue("");
   }
 
   function toggle(id: number) {
@@ -75,6 +79,10 @@ export default function TodoApp({ filter }: { filter: Filter }) {
             onChange={(event) => setNewTitle(event.target.value)}
             onKeyDown={addTodo}
           />
+          <label className="new-todo-due">
+            Due date
+            <input type="date" value={newDue} onChange={(event) => setNewDue(event.target.value)} onKeyDown={addTodo} />
+          </label>
         </header>
         {todos.length > 0 && (
           <section className="main">
