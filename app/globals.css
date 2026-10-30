@@ -7,7 +7,8 @@
   flex: 1;
 }
 
-.new-todo-due {
+.new-todo-due,
+.todo-list li .edit-due {
   display: flex;
   flex-direction: column;
   padding: 0 12px;
@@ -15,7 +16,8 @@
   color: #4d4d4d;
 }
 
-.new-todo-due input {
+.new-todo-due input,
+.todo-list li .edit-due input {
   font: inherit;
   font-size: 14px;
 }
@@ -48,4 +50,14 @@
 .todo-count .overdue-count {
   display: block;
   color: #b83f45;
+}
+
+.edit-row {
+  display: flex;
+  align-items: center;
+}
+
+.todo-list li.editing .edit-row .edit {
+  flex: 1;
+  min-width: 0;
 }

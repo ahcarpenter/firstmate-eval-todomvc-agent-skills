@@ -47,6 +47,14 @@ export function isOverdue(todo: Todo, today: string): boolean {
   return !todo.completed && parseDueDate(todo.dueDate) !== null && todo.dueDate! < today;
 }
 
+// Applies an edit; an empty due date removes the todo's date.
+export function editTodo(todo: Todo, title: string, dueDate: string): Todo {
+  const edited: Todo = { ...todo, title };
+  if (dueDate) edited.dueDate = dueDate;
+  else delete edited.dueDate;
+  return edited;
+}
+
 export function filterTodos(todos: Todo[], filter: Filter, today: string): Todo[] {
   if (filter === "active") return todos.filter((todo) => !todo.completed);
   if (filter === "completed") return todos.filter((todo) => todo.completed);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, formatDueDate, isOverdue, localDateString, nextId, pluralize, type Todo } from "./todos";
+import { editTodo, filterTodos, formatDueDate, isOverdue, localDateString, nextId, pluralize, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -99,5 +99,23 @@ describe("localDateString", () => {
   it("uses the local calendar day", () => {
     expect(localDateString(new Date(2026, 9, 30, 23, 59))).toBe("2026-10-30");
     expect(localDateString(new Date(2026, 0, 5, 0, 0))).toBe("2026-01-05");
+  });
+});
+
+describe("editTodo", () => {
+  const todo: Todo = { id: 3, title: "Pay rent", completed: false, dueDate: "2026-10-29" };
+
+  it("changes the title and the due date", () => {
+    expect(editTodo(todo, "Pay the rent", "2026-11-05")).toEqual({ ...todo, title: "Pay the rent", dueDate: "2026-11-05" });
+  });
+
+  it("adds a due date to an undated todo", () => {
+    expect(editTodo(todos[0], "Buy milk", "2026-11-01")).toEqual({ ...todos[0], dueDate: "2026-11-01" });
+  });
+
+  it("removes the due date when it is cleared", () => {
+    const edited = editTodo(todo, "Pay rent", "");
+    expect(edited).toEqual({ id: 3, title: "Pay rent", completed: false });
+    expect("dueDate" in edited).toBe(false);
   });
 });
