@@ -1,0 +1,11 @@
+/* todomvc-app-css hides the delete button with display: none, which also removes it from
+   the tab order and the accessibility tree. Hide it visually instead and reveal it on focus. */
+.todo-list li .destroy {
+  display: block;
+  opacity: 0;
+}
+
+.todo-list li:hover .destroy,
+.todo-list li:focus-within .destroy {
+  opacity: 1;
+}

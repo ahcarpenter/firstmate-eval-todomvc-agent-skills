@@ -70,6 +70,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
           <input
             className="new-todo"
             placeholder="What needs to be done?"
+            aria-label="New todo"
             autoFocus
             value={newTitle}
             onChange={(event) => setNewTitle(event.target.value)}
@@ -133,7 +134,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
         )}
       </section>
       <footer className="info">
-        <p>Double-click to edit a todo</p>
+        <p>Double-click, or press Enter on a todo, to edit it</p>
         <p>
           Part of <a href="https://todomvc.com">TodoMVC</a>
         </p>
