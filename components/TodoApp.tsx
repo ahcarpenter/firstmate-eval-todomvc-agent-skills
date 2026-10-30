@@ -1,28 +1,61 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import ListNav from "@/components/ListNav";
 import TodoItem from "@/components/TodoItem";
-import { filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
+import {
+  addList,
+  filterTodos,
+  listPath,
+  loadLists,
+  nextId,
+  pluralize,
+  saveLists,
+  type Filter,
+  type Todo,
+  type TodoList,
+} from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
 
-export default function TodoApp({ filter }: { filter: Filter }) {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [loaded, setLoaded] = useState(false);
+// Without a listId (the `/` routes), shows the first list and moves the URL to it.
+export default function TodoApp({ listId, filter }: { listId?: string; filter: Filter }) {
+  const router = useRouter();
+  const [lists, setLists] = useState<TodoList[] | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
   useEffect(() => {
     // Read storage after mount so the server render and the first client render match.
+    const loaded = loadLists();
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTodos(loadTodos());
-    setLoaded(true);
-  }, []);
+    setLists(loaded);
+    if (listId === undefined) router.replace(listPath(loaded[0].id, filter));
+  }, [listId, filter, router]);
 
-  useEffect(() => {
-    if (loaded) saveTodos(todos);
-  }, [todos, loaded]);
+  const currentId = listId ?? lists?.[0].id;
+  const list = lists?.find((candidate) => candidate.id === currentId);
+  const todos = list?.todos ?? [];
+
+  // Saves right away, not in an effect, so the next route reads the new state from storage.
+  function updateLists(next: TodoList[]) {
+    saveLists(next);
+    setLists(next);
+  }
+
+  function setTodos(next: Todo[]) {
+    if (!lists || !list) return;
+    updateLists(lists.map((candidate) => (candidate.id === list.id ? { ...candidate, todos: next } : candidate)));
+  }
+
+  function createList(name: string) {
+    if (!lists) return;
+    const next = addList(lists, name);
+    updateLists(next);
+    router.push(listPath(next[next.length - 1].id));
+  }
 
   function addTodo(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key !== ENTER_KEY) return;
@@ -67,14 +100,18 @@ export default function TodoApp({ filter }: { filter: Filter }) {
       <section className="todoapp">
         <header className="header">
           <h1>todos</h1>
-          <input
-            className="new-todo"
-            placeholder="What needs to be done?"
-            autoFocus
-            value={newTitle}
-            onChange={(event) => setNewTitle(event.target.value)}
-            onKeyDown={addTodo}
-          />
+          {lists && !list ? (
+            <p className="missing-list">This list does not exist.</p>
+          ) : (
+            <input
+              className="new-todo"
+              placeholder="What needs to be done?"
+              autoFocus
+              value={newTitle}
+              onChange={(event) => setNewTitle(event.target.value)}
+              onKeyDown={addTodo}
+            />
+          )}
         </header>
         {todos.length > 0 && (
           <section className="main">
@@ -102,24 +139,24 @@ export default function TodoApp({ filter }: { filter: Filter }) {
             </ul>
           </section>
         )}
-        {todos.length > 0 && (
+        {list && todos.length > 0 && (
           <footer className="footer">
             <span className="todo-count">
               <strong>{activeCount}</strong> {pluralize(activeCount, "item")} left
             </span>
             <ul className="filters">
               <li>
-                <Link href="/" className={filter === "all" ? "selected" : undefined}>
+                <Link href={listPath(list.id)} className={filter === "all" ? "selected" : undefined}>
                   All
                 </Link>
               </li>
               <li>
-                <Link href="/active" className={filter === "active" ? "selected" : undefined}>
+                <Link href={listPath(list.id, "active")} className={filter === "active" ? "selected" : undefined}>
                   Active
                 </Link>
               </li>
               <li>
-                <Link href="/completed" className={filter === "completed" ? "selected" : undefined}>
+                <Link href={listPath(list.id, "completed")} className={filter === "completed" ? "selected" : undefined}>
                   Completed
                 </Link>
               </li>
@@ -132,6 +169,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
           </footer>
         )}
       </section>
+      {lists && <ListNav lists={lists} currentId={currentId} onCreate={createList} />}
       <footer className="info">
         <p>Double-click to edit a todo</p>
         <p>

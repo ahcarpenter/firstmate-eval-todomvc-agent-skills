@@ -4,11 +4,22 @@ export type Todo = {
   completed: boolean;
 };
 
+export type TodoList = {
+  id: string;
+  name: string;
+  todos: Todo[];
+};
+
 export type Filter = "all" | "active" | "completed";
 
 export const FILTERS: Filter[] = ["all", "active", "completed"];
 
-export const STORAGE_KEY = "todos-nextjs";
+// Todos saved before lists existed. They seed the "Todos" list and are left in place.
+export const LEGACY_STORAGE_KEY = "todos-nextjs";
+
+export const STORAGE_KEY = "todos-nextjs-lists";
+
+export const DEFAULT_LIST_NAME = "Todos";
 
 export function nextId(todos: Todo[]): number {
   return todos.length + 1;
@@ -24,15 +35,40 @@ export function filterTodos(todos: Todo[], filter: Filter): Todo[] {
   return todos;
 }
 
-export function loadTodos(): Todo[] {
+export function listPath(listId: string, filter: Filter = "all"): string {
+  const base = `/lists/${encodeURIComponent(listId)}`;
+  return filter === "all" ? base : `${base}/${filter}`;
+}
+
+export function nextListId(lists: TodoList[]): string {
+  return String(Math.max(0, ...lists.map((list) => Number(list.id) || 0)) + 1);
+}
+
+export function addList(lists: TodoList[], name: string): TodoList[] {
+  return [...lists, { id: nextListId(lists), name, todos: [] }];
+}
+
+function parse<T>(raw: string | null): T | null {
+  if (!raw) return null;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Todo[]) : [];
+    return JSON.parse(raw) as T;
   } catch {
-    return [];
+    return null;
   }
 }
 
-export function saveTodos(todos: Todo[]): void {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+// Builds the lists from storage, turning pre-list todos into a list called "Todos".
+export function parseLists(raw: string | null, legacyRaw: string | null): TodoList[] {
+  const lists = parse<TodoList[]>(raw);
+  if (Array.isArray(lists) && lists.length > 0) return lists;
+  const legacy = parse<Todo[]>(legacyRaw);
+  return [{ id: "1", name: DEFAULT_LIST_NAME, todos: Array.isArray(legacy) ? legacy : [] }];
+}
+
+export function loadLists(): TodoList[] {
+  return parseLists(window.localStorage.getItem(STORAGE_KEY), window.localStorage.getItem(LEGACY_STORAGE_KEY));
+}
+
+export function saveLists(lists: TodoList[]): void {
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(lists));
 }

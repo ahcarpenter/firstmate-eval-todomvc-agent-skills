@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, nextId, pluralize, type Todo } from "./todos";
+import { addList, filterTodos, listPath, nextId, parseLists, pluralize, type Todo, type TodoList } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -38,5 +38,55 @@ describe("filterTodos", () => {
 
   it("returns only completed todos", () => {
     expect(filterTodos(todos, "completed").map((todo) => todo.id)).toEqual([2]);
+  });
+});
+
+describe("listPath", () => {
+  it("links the all filter to the list itself", () => {
+    expect(listPath("2")).toBe("/lists/2");
+    expect(listPath("2", "all")).toBe("/lists/2");
+  });
+
+  it("appends the other filters", () => {
+    expect(listPath("2", "active")).toBe("/lists/2/active");
+    expect(listPath("2", "completed")).toBe("/lists/2/completed");
+  });
+});
+
+describe("addList", () => {
+  it("appends an empty list after the highest id", () => {
+    const lists: TodoList[] = [
+      { id: "1", name: "Todos", todos },
+      { id: "3", name: "Work", todos: [] },
+    ];
+    expect(addList(lists, "Home")).toEqual([...lists, { id: "4", name: "Home", todos: [] }]);
+  });
+});
+
+describe("parseLists", () => {
+  it("returns the stored lists", () => {
+    const lists: TodoList[] = [{ id: "1", name: "Work", todos }];
+    expect(parseLists(JSON.stringify(lists), null)).toEqual(lists);
+  });
+
+  it("turns todos saved before lists existed into a list called Todos", () => {
+    expect(parseLists(null, JSON.stringify(todos))).toEqual([{ id: "1", name: "Todos", todos }]);
+  });
+
+  it("prefers stored lists over the old todos", () => {
+    const lists: TodoList[] = [{ id: "1", name: "Work", todos: [] }];
+    expect(parseLists(JSON.stringify(lists), JSON.stringify(todos))).toEqual(lists);
+  });
+
+  it("starts with an empty Todos list when nothing is stored", () => {
+    expect(parseLists(null, null)).toEqual([{ id: "1", name: "Todos", todos: [] }]);
+  });
+
+  it("never returns no lists", () => {
+    expect(parseLists("[]", JSON.stringify(todos))).toEqual([{ id: "1", name: "Todos", todos }]);
+  });
+
+  it("ignores unreadable storage", () => {
+    expect(parseLists("{", "not json")).toEqual([{ id: "1", name: "Todos", todos: [] }]);
   });
 });
