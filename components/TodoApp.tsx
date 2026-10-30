@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import TodoItem from "@/components/TodoItem";
-import { filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
+import { completedPercent, filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
 
@@ -61,6 +61,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   const shown = filterTodos(todos, filter);
   const activeCount = todos.filter((todo) => !todo.completed).length;
   const completedCount = todos.length - activeCount;
+  const percent = completedPercent(todos);
 
   return (
     <>
@@ -76,6 +77,20 @@ export default function TodoApp({ filter }: { filter: Filter }) {
             onKeyDown={addTodo}
           />
         </header>
+        {todos.length > 0 && (
+          <div className="progress" style={{ padding: "8px 16px" }}>
+            <progress
+              className="progress-bar"
+              max={100}
+              value={percent}
+              aria-labelledby="progress-label"
+              style={{ width: "100%" }}
+            />
+            <span id="progress-label" className="progress-label">
+              {percent}% complete
+            </span>
+          </div>
+        )}
         {todos.length > 0 && (
           <section className="main">
             <input
