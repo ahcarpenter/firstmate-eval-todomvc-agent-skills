@@ -29,3 +29,27 @@ test("shows how many todos are completed", async ({ page }) => {
   await page.getByRole("button", { name: "Clear completed" }).click();
   await expect(completed).toHaveCount(0);
 });
+
+test("shows a progress bar of completed todos", async ({ page }) => {
+  await page.goto("/");
+  const progress = page.getByRole("progressbar");
+  await expect(progress).toHaveCount(0);
+
+  const input = page.getByPlaceholder("What needs to be done?");
+  for (const title of ["Buy milk", "Walk the dog", "Read a book", "Call mom", "Water plants"]) {
+    await input.fill(title);
+    await input.press("Enter");
+  }
+  await expect(progress).toHaveText("0% complete");
+
+  await page.locator(".todo-list li .toggle").first().check();
+  await page.locator(".todo-list li .toggle").nth(1).check();
+  await expect(progress).toHaveText("40% complete");
+  await expect(progress).toHaveAttribute("aria-valuenow", "40");
+
+  await page.getByText("Mark all as complete").click();
+  await expect(progress).toHaveText("100% complete");
+
+  await page.getByRole("button", { name: "Clear completed" }).click();
+  await expect(progress).toHaveCount(0);
+});
