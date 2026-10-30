@@ -29,13 +29,15 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     if (event.key !== ENTER_KEY) return;
     const title = newTitle.trim();
     if (!title) return;
-    const duplicate = findActiveDuplicate(todos, title);
-    if (duplicate) {
-      setNotice(`“${duplicate.title}” is already on your list.`);
-      return;
-    }
+    if (noticeIfDuplicate(title)) return;
     setTodos([...todos, { id: nextId(todos), title, completed: false }]);
     setNewTitle("");
+  }
+
+  function noticeIfDuplicate(title: string, exceptId?: number): boolean {
+    const duplicate = findActiveDuplicate(todos, title, exceptId);
+    if (duplicate) setNotice(`“${duplicate.title}” is already on your list.`);
+    return Boolean(duplicate);
   }
 
   function toggle(id: number) {
@@ -54,7 +56,8 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     const trimmed = title.trim();
     if (!trimmed) {
       destroy(id);
-    } else {
+    } else if (!noticeIfDuplicate(trimmed, id)) {
+      setNotice("");
       setTodos(todos.map((todo) => (todo.id === id ? { ...todo, title: trimmed } : todo)));
     }
     setEditingId(null);
