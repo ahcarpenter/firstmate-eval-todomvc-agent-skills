@@ -63,6 +63,12 @@ export function filterTodos(todos: Todo[], filter: Filter, today: string = today
   return todos;
 }
 
+// Titles containing the text, ignoring case; an empty search keeps every todo.
+export function searchTodos(todos: Todo[], text: string): Todo[] {
+  const needle = text.toLowerCase();
+  return todos.filter((todo) => todo.title.toLowerCase().includes(needle));
+}
+
 // Earliest due date first, undated todos last; ties keep their list order.
 export function sortByDue(todos: Todo[]): Todo[] {
   return [...todos].sort((a, b) => {

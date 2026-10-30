@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { filterTodos, formatDue, isOverdue, nextId, pluralize, sortByDue, todayISO, withDue, type Todo } from "./todos";
+import {
+  filterTodos,
+  formatDue,
+  isOverdue,
+  nextId,
+  pluralize,
+  searchTodos,
+  sortByDue,
+  todayISO,
+  withDue,
+  type Todo,
+} from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -132,5 +143,21 @@ describe("sortByDue", () => {
   it("leaves the original list untouched", () => {
     sortByDue(list);
     expect(list.map((todo) => todo.id)).toEqual([1, 2, 3, 4, 5]);
+  });
+});
+
+describe("searchTodos", () => {
+  it("keeps todos whose title contains the text, ignoring case", () => {
+    expect(searchTodos(todos, "MILK").map((todo) => todo.id)).toEqual([1]);
+    expect(searchTodos(todos, "buy").map((todo) => todo.id)).toEqual([1]);
+    expect(searchTodos(todos, "the d").map((todo) => todo.id)).toEqual([2]);
+  });
+
+  it("returns nothing when no title matches", () => {
+    expect(searchTodos(todos, "rent")).toEqual([]);
+  });
+
+  it("returns everything for an empty search", () => {
+    expect(searchTodos(todos, "")).toEqual(todos);
   });
 });

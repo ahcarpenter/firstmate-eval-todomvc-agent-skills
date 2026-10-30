@@ -1,0 +1,18 @@
+/* The search field above the list, styled like the due date inputs. */
+
+.main .search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 8px 60px;
+  border-bottom: 1px solid #ededed;
+  color: #757575;
+}
+
+.main .search input {
+  flex: 1;
+  font: inherit;
+  color: #484848;
+  border: 1px solid #e6e6e6;
+  padding: 4px;
+}
