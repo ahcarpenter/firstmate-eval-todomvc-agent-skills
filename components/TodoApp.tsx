@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import TodoItem from "@/components/TodoItem";
-import { filterTodos, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
+import { filterTodos, findActiveDuplicate, loadTodos, nextId, pluralize, saveTodos, type Filter, type Todo } from "@/lib/todos";
 
 const ENTER_KEY = "Enter";
 
@@ -11,6 +11,7 @@ export default function TodoApp({ filter }: { filter: Filter }) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [notice, setNotice] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -28,6 +29,11 @@ export default function TodoApp({ filter }: { filter: Filter }) {
     if (event.key !== ENTER_KEY) return;
     const title = newTitle.trim();
     if (!title) return;
+    const duplicate = findActiveDuplicate(todos, title);
+    if (duplicate) {
+      setNotice(`“${duplicate.title}” is already on your list.`);
+      return;
+    }
     setTodos([...todos, { id: nextId(todos), title, completed: false }]);
     setNewTitle("");
   }
@@ -72,9 +78,15 @@ export default function TodoApp({ filter }: { filter: Filter }) {
             placeholder="What needs to be done?"
             autoFocus
             value={newTitle}
-            onChange={(event) => setNewTitle(event.target.value)}
+            onChange={(event) => {
+              setNewTitle(event.target.value);
+              setNotice("");
+            }}
             onKeyDown={addTodo}
           />
+          <p role="status" style={notice ? { padding: "0 16px 16px 60px", color: "#b83f45" } : undefined}>
+            {notice}
+          </p>
         </header>
         {todos.length > 0 && (
           <section className="main">
