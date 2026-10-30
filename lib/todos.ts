@@ -70,6 +70,13 @@ export function filterTodos(todos: Todo[], filter: Filter, today: string): Todo[
   return todos;
 }
 
+// Todos whose title contains the query, ignoring case and spaces around the query.
+export function searchTodos(todos: Todo[], query: string): Todo[] {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return todos;
+  return todos.filter((todo) => todo.title.toLowerCase().includes(needle));
+}
+
 // Earliest due date first, undated todos last; ties keep their order because sort is stable.
 export function sortByDueDate(todos: Todo[]): Todo[] {
   const key = (todo: Todo) => (parseDueDate(todo.dueDate) ? todo.dueDate! : null);

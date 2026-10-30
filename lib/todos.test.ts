@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { editTodo, filterTodos, formatDueDate, isOverdue, localDateString, nextId, pluralize, sortByDueDate, type Todo } from "./todos";
+import { editTodo, filterTodos, formatDueDate, isOverdue, localDateString, nextId, pluralize, searchTodos, sortByDueDate, type Todo } from "./todos";
 
 const todos: Todo[] = [
   { id: 1, title: "Buy milk", completed: false },
@@ -162,5 +162,25 @@ describe("sortByDueDate", () => {
     const copy = [...dated];
     sortByDueDate(dated);
     expect(dated).toEqual(copy);
+  });
+});
+
+describe("searchTodos", () => {
+  it("keeps todos whose title contains the query, ignoring case", () => {
+    expect(searchTodos(dated, "PAY").map((todo) => todo.id)).toEqual([3]);
+    expect(searchTodos(dated, "al").map((todo) => todo.id)).toEqual([2, 5]);
+  });
+
+  it("returns everything for an empty or blank query", () => {
+    expect(searchTodos(dated, "")).toBe(dated);
+    expect(searchTodos(dated, "  ")).toBe(dated);
+  });
+
+  it("ignores spaces around the query", () => {
+    expect(searchTodos(dated, " milk ").map((todo) => todo.id)).toEqual([1]);
+  });
+
+  it("returns nothing when no title matches", () => {
+    expect(searchTodos(dated, "zebra")).toEqual([]);
   });
 });
